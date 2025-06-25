@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ρυθμίσεις MQTT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<nav>
+  <div class="menu-toggle" id="menu-toggle">&#9776;</div>
+  <ul id="menu" class="menu">
+    <li><a href="/">Αρχική</a></li>
+    <li><a href="/mqtt">Ρυθμίσεις MQTT</a></li>
+  </ul>
+</nav>
+<button id="dark-mode-toggle">Dark Mode</button>
+<div class="container">
+  <h1>Ρυθμίσεις MQTT</h1>
+  <form id="mqtt-form">
+    <label for="ip">IP Address</label>
+    <input type="text" id="ip" name="ip" placeholder="π.χ. 192.168.1.100" required />
+
+    <label for="port">Port</label>
+    <input type="number" id="port" name="port" placeholder="π.χ. 1883" required min="1" max="65535" />
+
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="MQTT username" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="MQTT password" />
+
+    <button type="submit">Αποθήκευση Ρυθμίσεων</button>
+    <button type="button" id="test-connection">Δοκίμασε Σύνδεση</button>
+  </form>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // Hamburger toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('menu');
+  menuToggle.addEventListener('click', () => {
+    menu.classList.toggle('show');
+  });
+
+  // Toast helper
+  function showToast(msg, success=true) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.backgroundColor = success ? 'var(--primary-dark)' : 'var(--error)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // Φόρτωσε τις υπάρχουσες ρυθμίσεις (προαιρετικό - αν backend έχει endpoint GET /api/mqtt)
+  async function loadMqttConfig() {
+    try {
+      const res = await fetch('/api/mqtt');
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('ip').value = data.ip || '';
+        document.getElementById('port').value = data.port || '';
+        document.getElementById('username').value = data.username || '';
+        document.getElementById('password').value = data.password || '';
+      }
+    } catch (e) {
+      console.warn('Δεν φορτώθηκαν οι ρυθμίσεις MQTT');
+    }
+  }
+
+  loadMqttConfig();
+
+  document.getElementById('mqtt-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const config = {
+      ip: document.getElementById('ip').value.trim(),
+      port: +document.getElementById('port').value,
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value
+    };
+
+    try {
+      const res = await fetch('/api/mqtt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      });
+      if (res.ok) {
+        showToast('Ρυθμίσεις αποθηκεύτηκαν!');
+      } else {
+        showToast('Αποτυχία αποθήκευσης', false);
+      }
+    } catch (err) {
+      showToast('Σφάλμα δικτύου', false);
+    }
+  });
+
+  document.getElementById('test-connection').addEventListener('click', async () => {
+    const btn = document.getElementById('test-connection');
+    btn.disabled = true;
+    btn.textContent = 'Δοκιμή...';
+    
+    const config = {
+      ip: document.getElementById('ip').value.trim(),
+      port: +document.getElementById('port').value,
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value
+    };
+
+    try {
+      const res = await fetch('/api/mqtt/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      });
+      if (res.ok) {
+        const result = await res.json();
+        if (result.success) {
+          showToast('Η σύνδεση MQTT ήταν επιτυχής!');
+        } else {
+          showToast('Απέτυχε η σύνδεση MQTT: ' + (result.message || 'Άγνωστο σφάλμα'), false);
+        }
+      } else {
+        showToast('Απέτυχε η σύνδεση MQTT', false);
+      }
+    } catch {
+      showToast('Σφάλμα δικτύου κατά το test', false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Δοκίμασε Σύνδεση';
+    }
+  });
+
+  // Έλεγχος αν υπάρχει αποθηκευμένη προτίμηση
+  function applyDarkMode(enabled) {
+    if (enabled) {
+      document.body.classList.add('dark-mode');
+      document.getElementById('dark-mode-toggle').textContent = 'Light Mode';
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.getElementById('dark-mode-toggle').textContent = 'Dark Mode';
+    }
+    localStorage.setItem('darkMode', enabled ? 'true' : 'false');
+  }
+
+  // Κατά το φόρτωμα της σελίδας
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('darkMode') === 'true';
+    applyDarkMode(saved);
+
+    document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark-mode');
+      applyDarkMode(!isDark);
+    });
+  });
+
+</script>
+
+</body>
+</html>

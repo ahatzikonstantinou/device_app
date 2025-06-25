@@ -1,0 +1,198 @@
+:root {
+  --primary: #6200ee;
+  --primary-dark: #3700b3;
+  --secondary: #03dac6;
+  --background: #f4f4f4;
+  --surface: #fff;
+  --error: #b00020;
+  --text: #000;
+  --radius: 8px;
+  --toast-bg: #333;
+  --toast-color: #fff;
+  --toast-radius: 6px;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  padding: 20px;
+}
+
+h1, h2 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+}
+
+/* Container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--surface);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Hamburger Menu */
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  font-size: 28px;
+  user-select: none;
+}
+
+nav {
+  background: var(--primary);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive menu */
+@media (max-width: 700px) {
+  .menu-toggle {
+    display: block;
+  }
+  nav ul {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  nav ul.show {
+    display: flex;
+  }
+}
+
+/* Forms */
+form input[type="text"],
+form input[type="number"],
+form input[type="password"],
+form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+form label {
+  font-weight: 600;
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+form button {
+  padding: 12px 20px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Devices list */
+.device {
+  border-left: 5px solid var(--primary);
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: var(--surface);
+}
+
+.device-buttons {
+  margin-top: 12px;
+}
+
+.device-buttons button {
+  margin-right: 10px;
+  padding: 8px 14px;
+  background-color: var(--secondary);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.25s ease;
+}
+
+.device-buttons button:hover {
+  background-color: #00c3aa;
+}
+
+/* Toast notification */
+#toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--toast-bg);
+  color: var(--toast-color);
+  padding: 14px 24px;
+  border-radius: var(--toast-radius);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+  font-weight: 600;
+}
+
+#toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* MQTT test button spinner */
+.spinner {
+  border: 3px solid #f3f3f3; 
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}

@@ -1,0 +1,8 @@
+msgid "Device Management"
+msgstr "Διαχείριση Συσκευών"
+
+msgid "MQTT Settings"
+msgstr "Ρυθμίσεις MQTT"
+
+msgid "Add Device"
+msgstr "Προσθήκη Συσκευής"

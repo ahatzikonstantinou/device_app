@@ -1,0 +1,13 @@
+[Unit]
+Description=Device Management Flask App
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/my_device_app
+ExecStart=/usr/bin/python3 /home/pi/my_device_app/app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

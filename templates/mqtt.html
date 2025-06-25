@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _('MQTT Settings') }}</title>
+</head>
+<body>
+    <h1>{{ _('MQTT Settings') }}</h1>
+    <form id="mqttForm">
+        <label>Host: <input type="text" id="host" value="{{ config['host'] }}"></label><br>
+        <label>Port: <input type="number" id="port" value="{{ config['port'] }}"></label><br>
+        <button type="button" onclick="updateMQTT()">Update</button>
+    </form>
+    <script>
+    function updateMQTT() {
+        fetch('/api/mqtt', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                host: document.getElementById('host').value,
+                port: parseInt(document.getElementById('port').value)
+            })
+        }).then(() => alert('Updated!'));
+    }
+    </script>
+</body>
+</html>
