@@ -4,21 +4,31 @@
   <meta charset="UTF-8" />
   <title>Ρυθμίσεις MQTT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
 </head>
 <body>
 
 <nav>
-  <div class="menu-toggle" id="menu-toggle">&#9776;</div>
-  <ul id="menu" class="menu">
-    <li><a href="/">Αρχική</a></li>
-    <li><a href="/mqtt">Ρυθμίσεις MQTT</a></li>
-  </ul>
-</nav>
-<button id="dark-mode-toggle">Dark Mode</button>
+    <div class="menu-header">
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="page-title">Device Manager</div>
+    </div>
+
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <ul id="menu" class="menu">
+      <li><a href="/">Αρχική</a></li>
+      <li><a href="/settings" class="active">Ρυθμίσεις</a></li>
+    </ul>
+  </nav>
+
 <div class="container">
   <h1>Ρυθμίσεις MQTT</h1>
-  <form id="mqtt-form">
+  <!-- <form id="mqtt-form">
     <label for="ip">IP Address</label>
     <input type="text" id="ip" name="ip" placeholder="π.χ. 192.168.1.100" required />
 
@@ -33,7 +43,39 @@
 
     <button type="submit">Αποθήκευση Ρυθμίσεων</button>
     <button type="button" id="test-connection">Δοκίμασε Σύνδεση</button>
-  </form>
+  </form> -->
+
+  <form id="mqtt-form">
+  <fieldset>
+    <legend>MQTT</legend>
+
+    <div class="form-group">
+      <input type="text" id="ip" name="ip" placeholder=" " required />
+      <label for="ip">IP Address</label>
+    </div>
+
+    <div class="form-group">
+      <input type="number" id="port" name="port" placeholder=" " required min="1" max="65535" />
+      <label for="port">Port</label>
+    </div>
+
+    <div class="form-group">
+      <input type="text" id="username" name="username" placeholder=" " />
+      <label for="username">Username</label>
+    </div>
+
+    <div class="form-group">
+      <input type="password" id="password" name="password" placeholder=" " />
+      <label for="password">Password</label>
+    </div>
+
+    <div style="text-align: right;">
+      <button type="submit">💾 Αποθήκευση Ρυθμίσεων</button>
+      <button type="button" id="test-connection">🔌 Δοκίμασε Σύνδεση</button>
+    </div>
+  </fieldset>
+</form>
+
 </div>
 
 <div id="toast"></div>
@@ -158,6 +200,8 @@
   });
 
 </script>
+
+  <script src="{{ url_for('static', filename='menu.js') }}"></script>
 
 </body>
 </html>

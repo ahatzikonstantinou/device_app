@@ -93,8 +93,8 @@ def update_device(device_id):
     return jsonify({'status': 'ok'})
 
 
-@app.route('/mqtt')
-def mqtt_settings():
+@app.route('/settings')
+def settings():
     with open(CONFIG_FILE) as f:
         config = json.load(f)
     return render_template('settings.html', config=config)

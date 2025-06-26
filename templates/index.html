@@ -4,230 +4,102 @@
   <meta charset="UTF-8">
   <title>Device Manager</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <!--style>
-    :root {
-      --primary: #6200ee;
-      --primary-dark: #3700b3;
-      --secondary: #03dac6;
-      --background: #f4f4f4;
-      --surface: #ffffff;
-      --error: #b00020;
-      --text: #000;
-      --radius: 8px;
-    }
-
-    [data-theme="dark"] {
-      --background: #121212;
-      --surface: #1e1e1e;
-      --text: #f0f0f0;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--background);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    h1, h2 {
-      color: var(--primary-dark);
-    }
-
-    #mqtt-status {
-      font-weight: bold;
-      padding: 8px 12px;
-      border-radius: var(--radius);
-      display: inline-block;
-      margin-bottom: 16px;
-      background-color: #eee;
-    }
-
-    form {
-      background: var(--surface);
-      padding: 16px;
-      border-radius: var(--radius);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      margin-bottom: 20px;
-    }
-
-    form input, form button {
-      padding: 10px;
-      margin: 6px 0;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: var(--radius);
-    }
-
-    form button {
-      background: var(--primary);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    form button:hover {
-      background: var(--primary-dark);
-    }
-
-    .device {
-      background: var(--surface);
-      border-left: 5px solid var(--primary);
-      padding: 16px;
-      margin-bottom: 15px;
-      border-radius: var(--radius);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      animation: fadeIn 0.5s ease;
-    }
-
-    .device-buttons button {
-      margin-right: 10px;
-      padding: 6px 12px;
-      background-color: var(--secondary);
-      color: #000;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-    }
-
-    .device-buttons button:hover {
-      background-color: #00c3aa;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #333;
-      color: white;
-      padding: 12px 20px;
-      border-radius: var(--radius);
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.4s ease;
-      z-index: 999;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      form input {
-        font-size: 16px;
-      }
-
-      h1, h2 {
-        font-size: 1.4em;
-      }
-
-      .device {
-        font-size: 0.95em;
-        padding: 12px;
-      }
-
-      .device-buttons button {
-        padding: 5px 10px;
-        font-size: 0.9em;
-      }
-
-      .toast {
-        right: 10px;
-        left: 10px;
-        bottom: 20px;
-        font-size: 0.95em;
-      }
-    }
-
-    #theme-toggle {
-      float: right;
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--primary-dark);
-    }
-
-    body.dark {
-      background: #121212;
-      color: #e0e0e0;
-    }
-
-    body.dark form,
-    body.dark .device {
-      background-color: #1e1e1e;
-      border-color: #333;
-    }
-
-    body.dark input, body.dark button {
-      background-color: #2a2a2a;
-      color: #fff;
-      border: 1px solid #444;
-    }
-  </style!-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
 </head>
 <body>
 
   <nav>
-    <div class="menu-toggle" id="menu-toggle">&#9776;</div>
+    <div class="menu-header">
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="page-title">Device Manager</div>
+      <div id="mqtt-status">MQTT Status: Unknown</div>
+    </div>
+
+    <div class="menu-overlay" id="menu-overlay"></div>
     <ul id="menu" class="menu">
-      <li><a href="/">Αρχική</a></li>
-      <li><a href="/mqtt">Ρυθμίσεις MQTT</a></li>
+      <li><a href="/" class="active">Αρχική</a></li>
+      <li><a href="/settings">Ρυθμίσεις</a></li>
     </ul>
   </nav>
 
-<!-- <div style="display: flex; justify-content: space-between; align-items: right;">
-  <button id="theme-toggle">🌓 Dark Mode</button>
-</div> -->
-
 <div class="container">
   <h1>Devices</h1>
-  <div id="mqtt-status">MQTT Status: Unknown</div>
-
   <h2>Προσθήκη Συσκευής</h2>
   <div id="edit-indicator" style="display:none; margin-bottom: 10px; font-weight: bold; color: var(--primary-dark);"></div>
   <form id="add-device-form">
-    <input type="text" name="name" placeholder="Όνομα Συσκευής" required>
-    <input type="number" name="pin_active" placeholder="Pin: Active" required>
-    <input type="number" name="pin_enabled" placeholder="Pin: Enabled" required>
-    <input type="number" name="pin_open" placeholder="Pin: Open" required>
-    <input type="number" name="pin_enable" placeholder="Output Pin: Enable" required>
-    <input type="number" name="pin_override" placeholder="Output Pin: Override" required>
-    <button type="submit">➕ Προσθήκη</button>
+    <div class="form-group">
+      <input type="text" id="deviceName" name="name" required placeholder=" " />
+      <label for="deviceName">Όνομα Συσκευής</label>
+    </div>
+
+    <fieldset>
+      <legend>GPIO Pins</legend>
+
+      <div class="form-group">
+        <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
+        <label for="pin_active">Pin: Active</label>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="pin_enabled" name="pin_enabled" required placeholder=" " />
+        <label for="pin_enabled">Pin: Enabled</label>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="pin_open" name="pin_open" required placeholder=" " />
+        <label for="pin_open">Pin: Open</label>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
+        <label for="pin_enable">Output Pin: Enable</label>
+      </div>
+
+      <div class="form-group">
+        <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
+        <label for="pin_override">Output Pin: Override</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>MQTT</legend>
+
+      <div class="form-group">
+        <input type="text" id="mqtt_pub_topic" name="mqtt_pub_topic" placeholder=" " />
+        <label for="mqtt_pub_topic">MQTT Publish Topic</label>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="mqtt_sub_topic" name="mqtt_sub_topic" placeholder=" " />
+        <label for="mqtt_sub_topic">MQTT Subscribe Topic</label>
+      </div>
+    </fieldset>
+
+    <div style="text-align: right;">
+      <button type="submit">💾 Αποθήκευση</button>
+      <button type="button" onclick="closeAddDeviceModal()">❌ Κλείσιμο</button>
+    </div>
+    <!-- <button type="submit">➕ Προσθήκη</button> -->
   </form>
 
   <h2>Υφιστάμενες Συσκευές</h2>
   <div id="devices-container"></div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast-container"></div>
 
 <script>
-  // Hamburger toggle
-  const menuToggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('menu');
-  menuToggle.addEventListener('click', () => {
-    menu.classList.toggle('show');
-  });
+  // // Hamburger toggle
+  // const menuToggle = document.getElementById('menu-toggle');
+  // const menu = document.getElementById('menu');
+  // menuToggle.addEventListener('click', () => {
+  //   menu.classList.toggle('show');
+  // });
 
   let allDevices = [];
 
@@ -430,5 +302,6 @@
 
 </script>
 
+  <script src="{{ url_for('static', filename='menu.js') }}"></script>
 </body>
 </html>
