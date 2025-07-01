@@ -12,12 +12,14 @@
 
   <nav>
     <div class="menu-header">
-      <div class="menu-toggle" id="menu-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
+      <div class="left-group">
+        <div class="menu-toggle" id="menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="page-title">Device Manager</div>
       </div>
-      <div class="page-title">Device Manager</div>
       <div id="mqtt-status">MQTT Status: Unknown</div>
     </div>
 
@@ -31,10 +33,10 @@
 <div class="container master-detail-container">
     <div class="master" role="region" aria-label="Λίστα Συσκευών" style="flex:1; min-width: 280px; padding-right:1rem; border-right: 1px solid #ddd;">
       <h1>Devices</h1>
-      <div style="text-align: right; margin-bottom: 1rem;">
+      <div class="devices-header">
+        <h2>Υπάρχουσες Συσκευές</h2>
         <button type="button" class="text-btn" onclick="addNewDevice()"><span class="material-symbols-outlined">add</span>Προσθήκη Συσκευής</button>
       </div>
-      <h2>Υπάρχουσες Συσκευές</h2>
       <div id="devices-container"></div>
     </div>
 
@@ -106,6 +108,24 @@
 
 </div>
 
+<!-- Modal dialog to set Enable and Override pins-->
+<div id="pin-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 id="modal-title">Set Pin Value</h3>
+    <p>GPIO ID: <span id="gpio-id"></span></p>
+    <form id="pin-form">
+      <label><input type="radio" name="pin-value" value="0" checked> 0</label>
+      <label><input type="radio" name="pin-value" value="1"> 1</label>
+    </form>
+    <div id="response-msg" style="margin-top: 1rem;"></div>
+    <div id="loader" class="loader" style="display: none;"></div>
+    <div class="modal-buttons">
+      <button id="set-pin-btn" class="text-btn" onclick="submitPinValue()" disabled>Set</button>
+      <button class="text-btn" onclick="closePinModal()">Κλείσιμο</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -128,24 +148,24 @@
     return used;
   }
 
-  function showToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
+//   function showToast(message, type = 'success') {
+//   const toast = document.createElement('div');
+//   toast.className = `toast ${type}`;
 
-  toast.innerHTML = `
-    <span class="icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-    <span class="message">${message}</span>
-    <button class="close-btn" onclick="this.parentElement.remove()">✖</button>
-  `;
+//   toast.innerHTML = `
+//     <span class="icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+//     <span class="message">${message}</span>
+//     <button class="close-btn" onclick="this.parentElement.remove()">✖</button>
+//   `;
 
-  const container = document.getElementById('toast-container');
-  container.appendChild(toast);
+//   const container = document.getElementById('toast-container');
+//   container.appendChild(toast);
 
-  // Αφαίρεση μετά από 4s (ταιριάζει με το progress bar animation)
-  setTimeout(() => {
-    toast.remove();
-  }, 4000);
-}
+//   // Αφαίρεση μετά από 4s (ταιριάζει με το progress bar animation)
+//   setTimeout(() => {
+//     toast.remove();
+//   }, 4000);
+// }
 
 
   async function fetchDevices() {
@@ -201,16 +221,22 @@
             <h4 class="section-title">GPIO Pins</h4>
             <div class="group">
               <div class="pin-group">
-                <h5>State Pins</h5>
-                <div class="item">Active: <span>${p.active}</span></div>
-                <div class="item">Enabled: <span>${p.enabled}</span></div>
-                <div class="item">Open: <span>${p.open}</span></div>
+                <h5>Status Pins</h5>
+                <div class="item">Active: <span>${p.active.gpio_id} (${p.active.gpio_value})</span></div>
+                <div class="item">Enabled: <span>${p.enabled.gpio_id} (${p.enabled.gpio_value})</span></div>
+                <div class="item">Open: <span>${p.open.gpio_id} (${p.open.gpio_value})</span></div>
               </div>
 
               <div class="pin-group">
                 <h5>Control Pins</h5>
-                <div class="item">Enable: <span>${p.enable}</span></div>
-                <div class="item">Override: <span>${p.override}</span></div>
+                <div class="item">
+                  <button class="text-btn" onclick="openPinModal(${p.enable}, 'Enable')">Enable:</button>
+                  <span>${p.enable}</span>
+                </div>
+                <div class="item">
+                  <button class="text-btn" onclick="openPinModal(${p.override}, 'Override')">Override:</button>
+                  <span>${p.override}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -219,11 +245,11 @@
             <h4 class="section-title">MQTT</h4>
             <div class="group mqtt">
               <div class="mqtt-group">
-                <h5>Status:</h5>
+                <h5>Publish Status Topic</h5>
                 <div class="item">Status: <span>${mqtt.status || '-'}</span></div>
               </div>
               <div class="mqtt-group">
-                <h5>Control:</h5>
+                <h5>Subscribe Control Topics</h5>
                 <div class="item">Enable: <span>${mqtt.enable || '-'}</div>
                 <div class="item">Override: <span>${mqtt.override || '-'}</div>
               </div>
@@ -265,9 +291,9 @@
     setEditIndicator(device.name);
     const form = document.getElementById('add-device-form');
     form.name.value = device.name;
-    form.pin_active.value = device.pins.active;
-    form.pin_enabled.value = device.pins.enabled;
-    form.pin_open.value = device.pins.open;
+    form.pin_active.value = device.pins.active.gpio_id;
+    form.pin_enabled.value = device.pins.enabled.gpio_id;
+    form.pin_open.value = device.pins.open.gpio_id;
     form.pin_enable.value = device.pins.enable;
     form.pin_override.value = device.pins.override;
     form.mqtt_pub_status_topic.value = device.mqtt.status;
@@ -508,5 +534,7 @@
 </script>
 
   <script src="{{ url_for('static', filename='menu.js') }}"></script>
+  <script src="{{ url_for('static', filename='toast.js') }}"></script>
+  <script src="{{ url_for('static', filename='modal_pin_set.js') }}"></script>
 </body>
 </html>

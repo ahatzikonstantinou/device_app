@@ -11,12 +11,14 @@
 
 <nav>
     <div class="menu-header">
-      <div class="menu-toggle" id="menu-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
+      <div class="left-group">
+        <div class="menu-toggle" id="menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="page-title">Settings</div>
       </div>
-      <div class="page-title">Device Manager</div>
     </div>
 
     <div class="menu-overlay" id="menu-overlay"></div>
@@ -27,75 +29,58 @@
   </nav>
 
 <div class="container">
-  <h1>Ρυθμίσεις MQTT</h1>
-  <!-- <form id="mqtt-form">
-    <label for="ip">IP Address</label>
-    <input type="text" id="ip" name="ip" placeholder="π.χ. 192.168.1.100" required />
-
-    <label for="port">Port</label>
-    <input type="number" id="port" name="port" placeholder="π.χ. 1883" required min="1" max="65535" />
-
-    <label for="username">Username</label>
-    <input type="text" id="username" name="username" placeholder="MQTT username" />
-
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="MQTT password" />
-
-    <button type="submit">Αποθήκευση Ρυθμίσεων</button>
-    <button type="button" id="test-connection">Δοκίμασε Σύνδεση</button>
-  </form> -->
-
+  <h1>Ρυθμίσεις</h1>
   <form id="mqtt-form">
-  <fieldset>
-    <legend>MQTT</legend>
+    <fieldset>
+      <legend>MQTT</legend>
 
-    <div class="form-group">
-      <input type="text" id="ip" name="ip" placeholder=" " required />
-      <label for="ip">IP Address</label>
-    </div>
+      <div class="form-group">
+        <input type="text" id="ip" name="ip" placeholder=" " required />
+        <label for="ip">IP Address</label>
+      </div>
 
-    <div class="form-group">
-      <input type="number" id="port" name="port" placeholder=" " required min="1" max="65535" />
-      <label for="port">Port</label>
-    </div>
+      <div class="form-group">
+        <input type="number" id="port" name="port" placeholder=" " required min="1" max="65535" />
+        <label for="port">Port</label>
+      </div>
 
-    <div class="form-group">
-      <input type="text" id="username" name="username" placeholder=" " />
-      <label for="username">Username</label>
-    </div>
+      <div class="form-group">
+        <input type="text" id="username" name="username" placeholder=" " />
+        <label for="username">Username</label>
+      </div>
 
-    <div class="form-group">
-      <input type="password" id="password" name="password" placeholder=" " />
-      <label for="password">Password</label>
-    </div>
+      <div class="form-group">
+        <input type="password" id="password" name="password" placeholder=" " />
+        <label for="password">Password</label>
+      </div>
 
-    <div style="text-align: right;">
-      <button type="submit">💾 Αποθήκευση Ρυθμίσεων</button>
-      <button type="button" id="test-connection">🔌 Δοκίμασε Σύνδεση</button>
-    </div>
-  </fieldset>
-</form>
+      <div style="text-align: right;">
+        <button type="submit" class="text-btn">Αποθήκευση</button>
+        <button type="button" id="test-connection" class="text-btn">Δοκιμή Σύνδεσης</button>
+      </div>
+    </fieldset>
+  </form>
 
 </div>
 
-<div id="toast"></div>
+<div id="toast-container"></div>
 
 <script>
-  // Hamburger toggle
-  const menuToggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('menu');
-  menuToggle.addEventListener('click', () => {
-    menu.classList.toggle('show');
-  });
+  // // Hamburger toggle
+  // const menuToggle = document.getElementById('menu-toggle');
+  // const menu = document.getElementById('menu');
+  // menuToggle.addEventListener('click', () => {
+  //   menu.classList.toggle('show');
+  // });
 
-  // Toast helper
-  function showToast(msg, success=true) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.style.backgroundColor = success ? 'var(--primary-dark)' : 'var(--error)';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+  // // Toast helper
+  // function showToast(msg, success=true) {
+  //   const toast = document.getElementById('toast');
+  //   toast.textContent = msg;
+  //   toast.style.backgroundColor = success ? 'var(--primary-dark)' : 'var(--error)';
+  //   toast.classList.add('show');
+  //   setTimeout(() => toast.classList.remove('show'), 3000);
+  // }
 
   // Φόρτωσε τις υπάρχουσες ρυθμίσεις (προαιρετικό - αν backend έχει endpoint GET /api/mqtt)
   async function loadMqttConfig() {
@@ -172,7 +157,7 @@
       showToast('Σφάλμα δικτύου κατά το test', false);
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Δοκίμασε Σύνδεση';
+      btn.textContent = 'Δοκιμή Σύνδεσης';
     }
   });
 
@@ -202,6 +187,6 @@
 </script>
 
   <script src="{{ url_for('static', filename='menu.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='toast.js') }}"></script>
 </body>
 </html>

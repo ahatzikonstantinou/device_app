@@ -74,9 +74,15 @@ def devices():
         }
         device_list .append(new_device)
         save_devices(device_list )
-        supervisor.add_device(data)
+        supervisor.add_device(new_device)
         return jsonify({'status': 'created'}), 201
-    return jsonify(device_list )
+
+    # Για κάθε device, διάβασε τα input pins και αντικατέστησε το device
+    updated_devices = []
+    for device in device_list:
+        updated_device = supervisor.read_input_pins(device)
+        updated_devices.append(updated_device)
+    return jsonify(device_list), 200
 
 @app.route('/api/devices/<device_id>', methods=['PUT', 'DELETE'])
 def update_device(device_id):
@@ -88,19 +94,13 @@ def update_device(device_id):
     if request.method == 'PUT':
         data = request.json
         device.update(data)
+        supervisor.update_device(device)
     elif request.method == 'DELETE':
         device_list .remove(device)
         supervisor.remove_device(device['id'])
 
     save_devices(device_list )
     return jsonify({'status': 'ok'})
-
-@app.route('/test-design')
-def test_design():
-    with open(CONFIG_FILE) as f:
-        config = json.load(f)
-    return render_template('test-design.html', config=config)
-
 
 @app.route('/settings')
 def settings():
@@ -138,6 +138,25 @@ def test_mqtt_connection():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+    
+
+@app.route('/gpio/<int:gpio_id>', methods=['PUT'])
+def set_gpio_output(gpio_id):
+    data = request.get_json()
+
+    if not data or 'value' not in data:
+        return jsonify({'success': False, 'error': 'Missing "value" in JSON body'}), 400
+
+    value = data['value']
+    if value not in [0, 1]:
+        return jsonify({'success': False, 'error': '"value" must be 0 or 1'}), 400
+
+    result = supervisor.set_output_value(gpio_id, value)
+
+    if result['success']:
+        return jsonify(result)
+    else:
+        return jsonify(result), 400
 
 if __name__ == '__main__':
     mqtt_client.connect()
