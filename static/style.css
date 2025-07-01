@@ -65,7 +65,7 @@ legend {
   border: none;
   border-bottom: 2px solid #ccc;
   outline: none;
-  padding: 12px 8px 8px 8px;
+  padding: 10px 8px 6px 8px;
   font-size: 16px;
   background: transparent;
   transition: border-color 0.3s;
@@ -479,4 +479,64 @@ button[type="button"]:hover {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* for radio buttons for output pins*/
+.form-inline-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-inline-pin input {
+  flex-grow: 1;
+  min-width: 0; /* σημαντικό για flexbox */
+  padding-left: 8px; /* αρκετό για το label */
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  background: transparent;
+}
+
+.form-inline-pin label {
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  font-size: 16px;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  background: white;
+  padding: 0 4px;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.form-inline-pin input:focus + label,
+.form-inline-pin input:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #6200ee;
+  background-color: #fff;
+  padding: 0 4px;
+}
+
+.form-inline-pin .radio-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  /*min-width: 100px; /* ✅ Καθορισμένο πλάτος ώστε να φαίνεται */
+  flex-shrink: 0;    /* ✅ Να μην μικραίνει αν δεν χωράει */
+  padding: 0.5rem 0;         /* ✅ Δίνει "ύψος" στον container */
+  min-height: 38px; /* ή 2rem αν προτιμάς */
+  z-index: 3; /* πάνω από το input */
+  white-space: nowrap;
+}
+
+.form-inline-pin .radio-group label
+{
+  position: relative;
+  pointer-events:auto
 }

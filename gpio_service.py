@@ -19,11 +19,14 @@ class GPIOSupervisor:
     def add_device(self, device):
         self.devices[device['id']] = device
         pins = device['pins']
-        GPIO.setup(pins['active'], GPIO.IN)
-        GPIO.setup(pins['enabled'], GPIO.IN)
-        GPIO.setup(pins['open'], GPIO.IN)
-        GPIO.setup(pins['enable'], GPIO.OUT)
-        GPIO.setup(pins['override'], GPIO.OUT)
+        GPIO.setup(pins['active']['pin'], GPIO.IN)
+        GPIO.setup(pins['enabled']['pin'], GPIO.IN)
+        GPIO.setup(pins['open']['pin'], GPIO.IN)
+        GPIO.setup(pins['enable']['pin'], GPIO.OUT)
+        self.set_output_value(pins['enable']['pin'], pins['enable']['value'])
+        GPIO.setup(pins['override']['pin'], GPIO.OUT)
+        self.set_output_value(pins['override']['pin'], pins['override']['value'])
+
 
     def update_device(self, device):
         # essentially updated the dictionary and reset the pins
@@ -40,34 +43,34 @@ class GPIOSupervisor:
         new_pins = {}
 
         for key in pins:
-            pin_num = pins[key]
+            pin_num = pins[key]['pin']
             if key in input_pins_keys:
                 gpio_val = GPIO.input(pin_num)
-                new_pins[key] = {'gpio_id': pin_num, 'gpio_value': gpio_val}
+                new_pins[key] = {'pin': pin_num, 'value': gpio_val}
             else:
                 # Για output pins μπορείς να κρατήσεις απλά τον αριθμό ή και να αφαιρέσεις
                 # Εδώ απλά κρατάμε την αρχική τιμή (προαιρετικό)
-                new_pins[key] = pin_num
+                new_pins[key] = pins[key]
 
         # Αντικαθιστούμε το pins dictionary με το νέο
         device['pins'] = new_pins
         return device
     
-    def set_output_value(self, gpio_id, value):
+    def set_output_value(self, pin, value):
         """
         Set value (0 or 1) to the given GPIO output pin.
         If the pin is not configured as output, return error.
         """
         try:
-            direction = GPIO.gpio_function(gpio_id)
+            direction = GPIO.gpio_function(pin)
             if direction != GPIO.OUT:
-                raise RuntimeError(f"GPIO {gpio_id} is not configured as OUTPUT (mode={direction})")
+                raise RuntimeError(f"GPIO {pin} is not configured as OUTPUT (mode={direction})")
 
-            GPIO.output(gpio_id, value)
-            return {"success": True, "gpio_id": gpio_id, "value_set": value}
+            GPIO.output(pin, value)
+            return {"success": True, "pin": pin, "value_set": value}
 
         except Exception as e:
-            return {"success": False, "gpio_id": gpio_id, "error": str(e)}
+            return {"success": False, "pin": pin, "error": str(e)}
         
     def monitor_loop(self):
         while True:

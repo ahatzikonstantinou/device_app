@@ -19,14 +19,38 @@ CONFIG_FILE = 'config.json'
 supervisor = GPIOSupervisor()
 
 # --- Helper functions ---
-def is_name_unique(name, device_list ):
-    return all(device['name'].lower() != name.lower() for device in device_list )
+def is_name_unique(name, device_list, exclude_id=None):
+    return all(device['name'].lower() != name.lower() or (exclude_id is not None and device['id'] == exclude_id) for device in device_list)
 
-def are_pins_unique(pins, device_list ):
+def are_pins_unique(pins, device_list, exclude_id=None):
     used = set()
-    for device in device_list :
-        used.update(device['pins'].values())
-    return all(pin not in used for pin in pins.values())
+    for device in device_list:
+        if exclude_id is not None and device['id'] == exclude_id:
+            continue
+        for pin_info in device['pins'].values():
+            used.add(pin_info['pin'])
+    for pin_info in pins.values():
+        if pin_info['pin'] in used:
+            return False
+    return True
+
+def normalize_pins(pins_in):
+    # Μετατροπή pins ώστε όλα να είναι dict με 'pin' και 'value'
+    pins = {}
+    for key, val in pins_in.items():
+        if isinstance(val, dict):
+            pin_num = val.get('pin')
+            value_num = val.get('value', 0)
+        else:
+            pin_num = val
+            value_num = 0
+        if not isinstance(pin_num, int) or not isinstance(value_num, int):
+            abort(400, f"Invalid pin or value for {key}")
+        pins[key] = {
+            "pin": pin_num,
+            "value": value_num
+        }
+    return pins
 
 def load_devices():
     if not os.path.exists(DEVICE_FILE):
@@ -57,8 +81,10 @@ def devices():
             abort(400, "Invalid input")
 
         name = data['name']
-        pins = data['pins']
+        pins_in  = data['pins']
         mqtt = data['mqtt']
+
+        pins = normalize_pins(pins_in)
 
         if not is_name_unique(name, device_list ):
             abort(400, "Device name must be unique.")
@@ -77,7 +103,7 @@ def devices():
         supervisor.add_device(new_device)
         return jsonify({'status': 'created'}), 201
 
-    # Για κάθε device, διάβασε τα input pins και αντικατέστησε το device
+    # GET: Για κάθε device, διάβασε τα input pins και αντικατέστησε το device
     updated_devices = []
     for device in device_list:
         updated_device = supervisor.read_input_pins(device)
@@ -86,6 +112,7 @@ def devices():
 
 @app.route('/api/devices/<device_id>', methods=['PUT', 'DELETE'])
 def update_device(device_id):
+    print(json.dumps(request.json, indent=4))
     device_list  = load_devices()
     device = next((d for d in device_list  if d['id'] == device_id), None)
     if not device:
@@ -93,13 +120,37 @@ def update_device(device_id):
 
     if request.method == 'PUT':
         data = request.json
-        device.update(data)
-        supervisor.update_device(device)
+        name = data['name']
+        pins_in  = data['pins']
+        mqtt = data['mqtt']
+
+        pins = normalize_pins(pins_in)
+
+        if not is_name_unique(name, device_list, device_id ):
+            abort(400, "Device name must be unique.")
+
+        if not are_pins_unique(pins, device_list, device_id ):
+            abort(400, "Pins must be unique across all devices.")
+
+        new_device = {
+            "id": str(uuid.uuid4()),
+            "name": name,
+            "pins": pins,
+            "mqtt": mqtt
+        }
+
+        # replace old device with new deive in list
+        for i, d in enumerate(device_list):
+            if d['id'] == device_id:
+                device_list[i] = new_device
+                break
+
+        supervisor.update_device(new_device)
     elif request.method == 'DELETE':
         device_list .remove(device)
         supervisor.remove_device(device['id'])
 
-    save_devices(device_list )
+    save_devices(device_list)
     return jsonify({'status': 'ok'})
 
 @app.route('/settings')
@@ -140,8 +191,8 @@ def test_mqtt_connection():
         return jsonify({'success': False, 'message': str(e)})
     
 
-@app.route('/gpio/<int:gpio_id>', methods=['PUT'])
-def set_gpio_output(gpio_id):
+@app.route('/gpio/<int:pin>', methods=['PUT'])
+def set_gpio_output(pin):
     data = request.get_json()
 
     if not data or 'value' not in data:
@@ -151,7 +202,7 @@ def set_gpio_output(gpio_id):
     if value not in [0, 1]:
         return jsonify({'success': False, 'error': '"value" must be 0 or 1'}), 400
 
-    result = supervisor.set_output_value(gpio_id, value)
+    result = supervisor.set_output_value(pin, value)
 
     if result['success']:
         return jsonify(result)

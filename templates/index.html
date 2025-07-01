@@ -69,14 +69,22 @@
             <label for="pin_open">Pin: Open</label>
           </div>
 
-          <div class="form-group">
+          <div class="form-inline-pin">
             <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
             <label for="pin_enable">Output Pin: Enable</label>
+            <div class="radio-group">
+              <label><input type="radio" name="pin_enable_value" value="0" /> 0</label>
+              <label><input type="radio" name="pin_enable_value" value="1" /> 1</label>
+            </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-inline-pin">
             <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
             <label for="pin_override">Output Pin: Override</label>
+            <div class="radio-group">
+              <label><input type="radio" name="pin_override_value" value="0" /> 0</label>
+              <label><input type="radio" name="pin_override_value" value="1" /> 1</label>
+            </div>
           </div>
         </fieldset>
 
@@ -129,13 +137,6 @@
 <div id="toast-container"></div>
 
 <script>
-  // // Hamburger toggle
-  // const menuToggle = document.getElementById('menu-toggle');
-  // const menu = document.getElementById('menu');
-  // menuToggle.addEventListener('click', () => {
-  //   menu.classList.toggle('show');
-  // });
-
   let allDevices = [];
 
   let isEditing = false; // ή true όταν μπαίνεις σε edit mode
@@ -148,26 +149,6 @@
     return used;
   }
 
-//   function showToast(message, type = 'success') {
-//   const toast = document.createElement('div');
-//   toast.className = `toast ${type}`;
-
-//   toast.innerHTML = `
-//     <span class="icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-//     <span class="message">${message}</span>
-//     <button class="close-btn" onclick="this.parentElement.remove()">✖</button>
-//   `;
-
-//   const container = document.getElementById('toast-container');
-//   container.appendChild(toast);
-
-//   // Αφαίρεση μετά από 4s (ταιριάζει με το progress bar animation)
-//   setTimeout(() => {
-//     toast.remove();
-//   }, 4000);
-// }
-
-
   async function fetchDevices() {
     const res = await fetch('/api/devices');
     const data = await res.json();
@@ -178,11 +159,31 @@
     const name = 'Πιεστικό σπιτιού';
 
     const pins = {
-      active: 1,
-      enabled: 2,
-      open: 3,
-      enable: 4,
-      override: 5
+      active: 
+      {
+        pin: 1,
+        value: 1
+      },
+      enabled: 
+      {
+        pin: 2,
+        value: 0
+      },
+      open:  
+      {
+        pin: 3,
+        value: 1
+      },
+      enable:  
+      {
+        pin: 4,
+        value: 0
+      },
+      override:  
+      {
+        pin: 5,
+        value: 1
+      }
     };
 
     const mqtt = {
@@ -222,20 +223,20 @@
             <div class="group">
               <div class="pin-group">
                 <h5>Status Pins</h5>
-                <div class="item">Active: <span>${p.active.gpio_id} (${p.active.gpio_value})</span></div>
-                <div class="item">Enabled: <span>${p.enabled.gpio_id} (${p.enabled.gpio_value})</span></div>
-                <div class="item">Open: <span>${p.open.gpio_id} (${p.open.gpio_value})</span></div>
+                <div class="item">Active: <span>${p.active.pin} (${p.active.value})</span></div>
+                <div class="item">Enabled: <span>${p.enabled.pin} (${p.enabled.value})</span></div>
+                <div class="item">Open: <span>${p.open.pin} (${p.open.value})</span></div>
               </div>
 
               <div class="pin-group">
                 <h5>Control Pins</h5>
                 <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.enable}, 'Enable')">Enable:</button>
-                  <span>${p.enable}</span>
+                  <button class="text-btn" onclick="openPinModal(${p.enable.pin}, ${p.enable.value}, 'Enable')">Enable:</button>
+                  <span>${p.enable.pin} (${p.enable.value})</span>
                 </div>
                 <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.override}, 'Override')">Override:</button>
-                  <span>${p.override}</span>
+                  <button class="text-btn" onclick="openPinModal(${p.override.pin}, ${p.override.value}, 'Override')">Override:</button>
+                  <span>${p.override.pin} (${p.override.value})</span>
                 </div>
               </div>
             </div>
@@ -291,11 +292,15 @@
     setEditIndicator(device.name);
     const form = document.getElementById('add-device-form');
     form.name.value = device.name;
-    form.pin_active.value = device.pins.active.gpio_id;
-    form.pin_enabled.value = device.pins.enabled.gpio_id;
-    form.pin_open.value = device.pins.open.gpio_id;
-    form.pin_enable.value = device.pins.enable;
-    form.pin_override.value = device.pins.override;
+    form.pin_active.value = device.pins.active.pin;
+    form.pin_enabled.value = device.pins.enabled.pin;
+    form.pin_open.value = device.pins.open.pin;
+    form.pin_enable.value = device.pins.enable.pin;
+    form.pin_enable.value = device.pins.enable.pin;
+    form.pin_enable_value.value = device.pins.enable.value;
+    form.pin_override.value = device.pins.override.pin;
+    form.pin_override_value.value = device.pins.override.value;
+    
     form.mqtt_pub_status_topic.value = device.mqtt.status;
     form.mqtt_sub_enable_topic.value = device.mqtt.enable;
     form.mqtt_sub_override_topic.value = device.mqtt.override;
@@ -327,8 +332,14 @@
       active: +form.get('pin_active'),
       enabled: +form.get('pin_enabled'),
       open: +form.get('pin_open'),
-      enable: +form.get('pin_enable'),
-      override: +form.get('pin_override')
+      enable: {
+        pin: +form.get('pin_enable'),
+        value: +form.get('pin_enable_value') 
+      },
+      override: {
+        pin: +form.get('pin_override'),
+        value: +form.get('pin_override_value') 
+      }
     };
 
     const mqtt = {
@@ -337,7 +348,16 @@
       override: form.get('mqtt_sub_override_topic')
     };
 
-    if (!name || Object.values(pins).some(v => isNaN(v))) {
+    if (
+      !name ||
+      isNaN(pins.active) ||
+      isNaN(pins.enabled) ||
+      isNaN(pins.open) ||
+      isNaN(pins.enable.pin) ||
+      isNaN(pins.enable.value) ||
+      isNaN(pins.override.pin) ||
+      isNaN(pins.override.value)
+    ) {
       showToast("Συμπλήρωσε όλα τα πεδία σωστά.", 'error');
       return;
     }

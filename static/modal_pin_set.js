@@ -1,6 +1,6 @@
 let currentGpioId = null;
 
-function openPinModal(gpioId, label) {
+function openPinModal(gpioId, gpioValue, label) {
   currentGpioId = gpioId;
   document.getElementById('gpio-id').innerText = gpioId;
   document.getElementById('modal-title').innerText = `${label} (GPIO ${gpioId})`;
@@ -8,6 +8,12 @@ function openPinModal(gpioId, label) {
   document.getElementById('set-pin-btn').disabled = false;
   document.getElementById('loader').style.display = 'none';
   document.getElementById('response-msg').innerText = '';
+
+  // Θέτουμε checked το radio button με βάση την currentValue
+  const radios = document.getElementsByName('pin-value');
+  radios.forEach(radio => {
+    radio.checked = (radio.value === String(gpioValue));
+  });
 }
 
 function closePinModal() {
