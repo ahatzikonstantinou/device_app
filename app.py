@@ -52,11 +52,13 @@ def devices():
     device_list  = load_devices()
     if request.method == 'POST':
         data = request.json
-        if not data or 'name' not in data or 'pins' not in data:
+        print(json.dumps(data, indent=4))
+        if not data or 'name' not in data or 'pins' not in data or 'mqtt' not in data:
             abort(400, "Invalid input")
 
         name = data['name']
         pins = data['pins']
+        mqtt = data['mqtt']
 
         if not is_name_unique(name, device_list ):
             abort(400, "Device name must be unique.")
@@ -67,7 +69,8 @@ def devices():
         new_device = {
             "id": str(uuid.uuid4()),
             "name": name,
-            "pins": pins
+            "pins": pins,
+            "mqtt": mqtt
         }
         device_list .append(new_device)
         save_devices(device_list )
@@ -91,6 +94,12 @@ def update_device(device_id):
 
     save_devices(device_list )
     return jsonify({'status': 'ok'})
+
+@app.route('/test-design')
+def test_design():
+    with open(CONFIG_FILE) as f:
+        config = json.load(f)
+    return render_template('test-design.html', config=config)
 
 
 @app.route('/settings')

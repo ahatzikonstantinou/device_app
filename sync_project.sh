@@ -2,7 +2,7 @@
 
 # Replace these variables with your actual values
 PI_USERNAME="antonis"
-PI_HOST="192.168.3.21"
+PI_HOST="192.168.3.23"
 PI_DESTINATION="/opt/device_app/"
 
 # Function to display usage information

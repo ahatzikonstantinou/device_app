@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Device Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />  
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
 
@@ -27,68 +28,82 @@
     </ul>
   </nav>
 
-<div class="container">
-  <h1>Devices</h1>
-  <h2>Προσθήκη Συσκευής</h2>
-  <div id="edit-indicator" style="display:none; margin-bottom: 10px; font-weight: bold; color: var(--primary-dark);"></div>
-  <form id="add-device-form">
-    <div class="form-group">
-      <input type="text" id="deviceName" name="name" required placeholder=" " />
-      <label for="deviceName">Όνομα Συσκευής</label>
+<div class="container master-detail-container">
+    <div class="master" role="region" aria-label="Λίστα Συσκευών" style="flex:1; min-width: 280px; padding-right:1rem; border-right: 1px solid #ddd;">
+      <h1>Devices</h1>
+      <div style="text-align: right; margin-bottom: 1rem;">
+        <button type="button" class="text-btn" onclick="addNewDevice()"><span class="material-symbols-outlined">add</span>Προσθήκη Συσκευής</button>
+      </div>
+      <h2>Υπάρχουσες Συσκευές</h2>
+      <div id="devices-container"></div>
     </div>
 
-    <fieldset>
-      <legend>GPIO Pins</legend>
+    <div class="detail" role="region" aria-label="Φόρμα Συσκευής" style="flex:2; min-width: 320px; padding-left:1rem;">
+      <h2 id="form-title">Προσθήκη Συσκευής</h2>
+      <div id="edit-indicator" style="display:none; margin-bottom: 10px; font-weight: bold; color: var(--primary-dark);"></div>
+      <button type="button" id="backBtn" class="text-btn" style="margin-bottom: 1rem; display:none;"><span class="material-symbols-outlined">arrow_back</span>Επιστροφή</button>
 
-      <div class="form-group">
-        <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
-        <label for="pin_active">Pin: Active</label>
-      </div>
+      <form id="add-device-form">
+        <div class="form-group">
+          <input type="text" id="deviceName" name="name" required placeholder=" " />
+          <label for="deviceName">Όνομα Συσκευής</label>
+        </div>
 
-      <div class="form-group">
-        <input type="number" id="pin_enabled" name="pin_enabled" required placeholder=" " />
-        <label for="pin_enabled">Pin: Enabled</label>
-      </div>
+        <fieldset>
+          <legend>GPIO Pins</legend>
 
-      <div class="form-group">
-        <input type="number" id="pin_open" name="pin_open" required placeholder=" " />
-        <label for="pin_open">Pin: Open</label>
-      </div>
+          <div class="form-group">
+            <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
+            <label for="pin_active">Pin: Active</label>
+          </div>
 
-      <div class="form-group">
-        <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
-        <label for="pin_enable">Output Pin: Enable</label>
-      </div>
+          <div class="form-group">
+            <input type="number" id="pin_enabled" name="pin_enabled" required placeholder=" " />
+            <label for="pin_enabled">Pin: Enabled</label>
+          </div>
 
-      <div class="form-group">
-        <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
-        <label for="pin_override">Output Pin: Override</label>
-      </div>
-    </fieldset>
+          <div class="form-group">
+            <input type="number" id="pin_open" name="pin_open" required placeholder=" " />
+            <label for="pin_open">Pin: Open</label>
+          </div>
 
-    <fieldset>
-      <legend>MQTT</legend>
+          <div class="form-group">
+            <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
+            <label for="pin_enable">Output Pin: Enable</label>
+          </div>
 
-      <div class="form-group">
-        <input type="text" id="mqtt_pub_topic" name="mqtt_pub_topic" placeholder=" " />
-        <label for="mqtt_pub_topic">MQTT Publish Topic</label>
-      </div>
+          <div class="form-group">
+            <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
+            <label for="pin_override">Output Pin: Override</label>
+          </div>
+        </fieldset>
 
-      <div class="form-group">
-        <input type="text" id="mqtt_sub_topic" name="mqtt_sub_topic" placeholder=" " />
-        <label for="mqtt_sub_topic">MQTT Subscribe Topic</label>
-      </div>
-    </fieldset>
+        <fieldset>
+          <legend>MQTT</legend>
 
-    <div style="text-align: right;">
-      <button type="submit">💾 Αποθήκευση</button>
-      <button type="button" onclick="closeAddDeviceModal()">❌ Κλείσιμο</button>
+          <div class="form-group">
+            <input type="text" id="mqtt_pub_status_topic" name="mqtt_pub_status_topic" placeholder=" " />
+            <label for="mqtt_pub_status_topic">Publish Status Topic</label>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="mqtt_sub_enable_topic" name="mqtt_sub_enable_topic" placeholder=" " />
+            <label for="mqtt_sub_enable_topic">Subscribe Enable Topic</label>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="mqtt_sub_override_topic" name="mqtt_sub_override_topic" placeholder=" " />
+            <label for="mqtt_sub_override_topic">Subscribe Override Topic</label>
+          </div>
+        </fieldset>
+
+        <div style="text-align: right;">
+          <button type="submit" class="text-btn">Αποθήκευση</button>
+          <button type="button" class="text-btn danger" onclick="closeAddDeviceModal()">Κλείσιμο</button>
+        </div>
+      </form>
     </div>
-    <!-- <button type="submit">➕ Προσθήκη</button> -->
-  </form>
 
-  <h2>Υφιστάμενες Συσκευές</h2>
-  <div id="devices-container"></div>
 </div>
 
 <div id="toast-container"></div>
@@ -111,13 +126,25 @@
     return used;
   }
 
-  function showToast(message, success = true) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.backgroundColor = success ? '#28a745' : '#dc3545';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+  function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  toast.innerHTML = `
+    <span class="icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+    <span class="message">${message}</span>
+    <button class="close-btn" onclick="this.parentElement.remove()">✖</button>
+  `;
+
+  const container = document.getElementById('toast-container');
+  container.appendChild(toast);
+
+  // Αφαίρεση μετά από 4s (ταιριάζει με το progress bar animation)
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+
 
   async function fetchDevices() {
     const res = await fetch('/api/devices');
@@ -128,19 +155,61 @@
 
     data.forEach(device => {
       const p = device.pins;
-      const div = document.createElement('div');
-      div.className = 'device';
-      div.innerHTML = `
-        <strong>${device.name}</strong><br>
-        Είσοδοι: Active=${p.active}, Enabled=${p.enabled}, Open=${p.open}<br>
-        Έξοδοι: Enable=${p.enable}, Override=${p.override}
-        <div class="device-buttons">
-          <button onclick="editDevice('${device.id}')">✏️ Edit</button>
-          <button onclick="deleteDevice('${device.id}')">🗑️ Διαγραφή</button>
+      const mqtt = device.mqtt || {};
+
+      const card = document.createElement('div');
+      card.className = 'device-card';
+
+      card.innerHTML = `
+        <div class="device-header" onclick="this.parentElement.classList.toggle('expanded')">
+          <h3 class="device-title">${device.name}</h3>
+          <span class="toggle-icon">▾</span>
+        </div>
+
+        <div class="device-details">
+          <div class="device-section">
+            <h4 class="section-title">GPIO Pins</h4>
+            <div class="group">
+              <div class="pin-group">
+                <h5>State Pins</h5>
+                <div class="item">Active: <span>${p.active}</span></div>
+                <div class="item">Enabled: <span>${p.enabled}</span></div>
+                <div class="item">Open: <span>${p.open}</span></div>
+              </div>
+
+              <div class="pin-group">
+                <h5>Control Pins</h5>
+                <div class="item">Enable: <span>${p.enable}</span></div>
+                <div class="item">Override: <span>${p.override}</span></div>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="device-section">
+            <h4 class="section-title">MQTT</h4>
+            <div class="group mqtt">
+              <div class="mqtt-group">
+                <h5>Status:</h5>
+                <div class="item">Status: <span>${mqtt.status || '-'}</span></div>
+              </div>
+              <div class="mqtt-group">
+                <h5>Control:</h5>
+                <div class="item">Enable: <span>${mqtt.enable || '-'}</div>
+                <div class="item">Override: <span>${mqtt.override || '-'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="device-buttons">
+            <button class="text-btn" onclick="editDevice('${device.id}')">Επεξεργασία</button>
+            <button class="text-btn danger" onclick="deleteDevice('${device.id}')">Διαγραφή</button>
+          </div>
         </div>
       `;
-      container.appendChild(div);
+
+      container.appendChild(card);
     });
+
   }
 
   async function deleteDevice(id) {
@@ -148,18 +217,19 @@
     const res = await fetch(`/api/devices/${id}`, { method: 'DELETE' });
     if (res.ok) {
       showToast("Διαγράφηκε.");
+      editingDeviceId = null;
       fetchDevices();
     } else {
-      showToast("Σφάλμα διαγραφής.", false);
+      showToast("Σφάλμα διαγραφής.", 'error');
     }
   }
 
   let editingDeviceId = null;
 
   function editDevice(id) {
+    document.getElementById('form-title').textContent = 'Επεξεργασία Συσκευής';
     const device = allDevices.find(d => d.id === id);
-    if (!device) return;
-
+    
     setEditIndicator(device.name);
     const form = document.getElementById('add-device-form');
     form.name.value = device.name;
@@ -168,11 +238,40 @@
     form.pin_open.value = device.pins.open;
     form.pin_enable.value = device.pins.enable;
     form.pin_override.value = device.pins.override;
+    form.mqtt_pub_status_topic.value = device.mqtt.status;
+    form.mqtt_sub_enable_topic.value = device.mqtt.enable;
+    form.mqtt_sub_override_topic.value = device.mqtt.override;
 
     editingDeviceId = id;
-    form.querySelector('button[type="submit"]').textContent = 'Update Device';
+    form.querySelector('button[type="submit"]').textContent = 'Ενημέρωση';
+    document.body.classList.add('show-detail');
+
+     // Responsive εμφάνιση
+    if (window.innerWidth <= 768) {
+      document.querySelector('.master').classList.add('hide');
+      document.querySelector('.detail').classList.add('show');
+      document.getElementById('backBtn').style.display = 'inline-block';
+    }
   }
 
+  function addNewDevice() {
+    editingDeviceId = null;
+    const form = document.getElementById('add-device-form');
+    form.querySelector('button[type="submit"]').textContent = 'Αποθήκευση';
+    document.body.classList.add('show-detail');
+
+    // Καθάρισε τη φόρμα
+    document.getElementById('add-device-form').reset();
+    document.getElementById('form-title').textContent = 'Προσθήκη Συσκευής';
+    document.getElementById('edit-indicator').style.display = 'none';
+
+    // Responsive εμφάνιση
+    if (window.innerWidth <= 768) {
+      document.querySelector('.master').classList.add('hide');
+      document.querySelector('.detail').classList.add('show');
+      document.getElementById('backBtn').style.display = 'inline-block';
+    }
+  }
 
   document.getElementById('add-device-form').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -187,15 +286,24 @@
       override: +form.get('pin_override')
     };
 
+    const mqtt = {
+      status: form.get('mqtt_pub_status_topic'),
+      enable: form.get('mqtt_sub_enable_topic'),
+      override: form.get('mqtt_sub_override_topic')
+    };
+
     if (!name || Object.values(pins).some(v => isNaN(v))) {
-      showToast("Συμπλήρωσε όλα τα πεδία σωστά.", false);
+      showToast("Συμπλήρωσε όλα τα πεδία σωστά.", 'error');
       return;
     }
 
     const device = {
       name,
-      pins
+      pins,
+      mqtt
     };
+
+    console.log(form, pins, mqtt, device);
 
     let res;
     if (editingDeviceId) {
@@ -208,14 +316,14 @@
       const used = getUsedPins();
       const conflict = Object.values(pins).find(p => used.has(p));
       if (conflict) {
-        showToast(`Το Pin ${conflict} χρησιμοποιείται ήδη.`, false);
+        showToast(`Το Pin ${conflict} χρησιμοποιείται ήδη.`, 'error');
         return;
       }
 
       res = await fetch('/api/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, pins })
+        body: JSON.stringify({ name, pins, mqtt })
       });
     }
 
@@ -225,9 +333,16 @@
       editingDeviceId = null;
       setEditIndicator(null);
       fetchDevices();
+      
+      // Responsive: Επιστροφή στο master view σε μικρή οθόνη
+      if (window.innerWidth <= 768) {
+        document.querySelector('.master').classList.remove('hide');
+        document.querySelector('.detail').classList.remove('show');
+        document.getElementById('backBtn').style.display = 'none';
+      }
     } else {
       const err = await res.text();
-      showToast("Σφάλμα: " + err, false);
+      showToast("Σφάλμα: " + err, 'error');
     }
   });
 
@@ -277,6 +392,56 @@
     }
   }
 
+  const masterPane = document.querySelector('.master');
+  const detailPane = document.querySelector('.detail');
+  const backBtn = document.getElementById('backBtn');
+
+  // Αρχική κατάσταση: σε μικρή οθόνη μόνο master
+  function updateLayout() {
+    if (window.innerWidth <= 768) {
+      detailPane.classList.remove('show');
+      masterPane.classList.add('show');
+      backBtn.style.display = 'none';
+    } else {
+      detailPane.classList.add('show');
+      masterPane.classList.remove('hide');
+      backBtn.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('resize', updateLayout);
+  updateLayout();
+
+  // Όταν ο χρήστης επιλέγει συσκευή από τη λίστα (πρέπει να έχεις onclick εκεί)
+  function openDetail() {
+    if (window.innerWidth <= 768) {
+      masterPane.classList.add('hide');
+      detailPane.classList.add('show');
+      backBtn.style.display = 'inline-block';
+    }
+  }
+
+  
+  document.getElementById('edit-indicator').textContent = 'Προσθήκη νέας συσκευής';
+  document.getElementById('edit-indicator').style.display = 'block';
+
+  function showMasterPane()
+  {
+    masterPane.classList.remove('hide');
+    detailPane.classList.remove('show');
+    backBtn.style.display = 'none';
+  }
+
+  // Κουμπί επιστροφής
+  backBtn.addEventListener('click', () => {
+    showMasterPane();
+  });
+
+  function closeAddDeviceModal() {
+    showMasterPane();
+  }
+
+
   // // Έλεγχος αν υπάρχει αποθηκευμένη προτίμηση
   // function applyDarkMode(enabled) {
   //   if (enabled) {
@@ -299,6 +464,25 @@
   //     applyDarkMode(!isDark);
   //   });
   // });
+
+  // Όταν οποιοδήποτε input μέσα στη σελίδα έχει focus, προσθέτουμε κλάση 'input-focused' στο body ή container
+  document.addEventListener('click', (e) => {
+    const deviceCard = e.target.closest('.device-card');
+    if (!deviceCard) return;
+
+    // Αν κλικ είναι στο header, toggle .expanded
+    if (e.target.closest('.device-header')) {
+      deviceCard.classList.toggle('expanded');
+      return;
+    }
+
+    // Αν κλικ εκτός input/textarea μέσα στην κάρτα, κλείσε τη detail
+    if (!e.target.closest('input, textarea, select')) {
+      deviceCard.classList.remove('expanded');
+    }
+  });
+
+
 
 </script>
 

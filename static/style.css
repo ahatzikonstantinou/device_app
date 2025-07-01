@@ -10,6 +10,12 @@ body {
   color: #333;  
 }
 
+body, html {
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /*apply padding only when the screen is narrow (mobile)*/
 @media (max-width: 768px) {
   body {
@@ -106,8 +112,8 @@ button:hover {
 }
 
 button[type="button"] {
-  background-color: #ccc;
-  color: #333;
+  /*background-color: #ccc;*/
+  color: #1976d2;
 }
 
 button[type="button"]:hover {
@@ -197,3 +203,216 @@ button[type="button"]:hover {
   to   { width: 0%; }
 }
 
+.master-detail-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+ @media (max-width: 768px) {
+  .master-detail-container {
+    flex-direction: column;
+  }
+  .detail {
+    display: none;
+  }
+  .detail.show {
+    display: block;
+  }
+  .master.show {
+    display: block;
+  }
+  .master {
+    display: block;
+  }
+  .master.hide {
+    display: none;
+  }
+  
+  /* Αν υπάρχει focus σε πεδίο, εμφάνισε τη detail πάντα */
+  body.input-focused .detail {
+    display: block !important;
+  }
+}
+
+/*για την λίστα των devices*/
+.device-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.device-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.device-card.expanded {
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.3);
+  cursor: auto;
+}
+
+.device-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  background: #f5f5f5;
+}
+
+.device-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212121;
+  margin: 0;
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+  color: #666;
+}
+
+.device-card.expanded .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.device-details {
+  padding: 0 1.25rem 1rem;
+  display: block;
+}
+
+.device-section {
+  margin-top: 1rem;
+}
+
+.device-section h5{
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary-dark);
+  margin-bottom: 0.6rem;
+  border-left: 4px solid var(--primary);
+  padding-left: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-variant-caps: all-small-caps;
+}
+
+.device-section .group {
+  display: flex;
+  gap: 2rem;
+}
+
+.device-section .item {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.device-section .item span {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.device-section .group.mqtt {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.group.mqtt .mqtt-group {
+  margin-top: 0;    /* Μηδενίζει το margin πάνω */
+  padding-top: 0;   /* Αν έχει padding, το μηδενίζει */
+  display: flex; /* Ώστε όλα τα item να έχουν ίδιο πλάτος */
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mqtt-group .item {
+  font-weight: 600;
+}
+
+.mqtt-group .item span{
+  font-weight: 500;
+}
+
+.group.mqtt .mqtt-group h5 {
+  margin-top: 0;    /* Μηδενίζει το πάνω margin */
+  margin-bottom: 0.4rem; /* Μικρότερο κάτω margin για λίγο διάστημα */
+  font-weight: 600; /* Αν θέλεις πιο έντονο τίτλο */
+}
+
+.pin-icon {
+  width: 18px;
+  height: 18px;
+  fill: var(--primary);
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.field-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
+
+.device-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.text-btn {
+  background: none;  
+  border: none;
+  color: #1976d2;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.text-btn:hover {
+  background: rgba(25, 118, 210, 0.08);
+}
+
+.text-btn.danger {
+  color: #d32f2f;
+}
+
+.text-btn.danger:hover {
+  background: rgba(211, 47, 47, 0.08);
+}
+
+/* Responsive behavior */
+/* @media (max-width: 768px) {
+  .device-card .device-details {
+    display: none;
+  }
+
+  .device-card.expanded .device-details {
+    display: block;
+  }
+} */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  font-size: 1.1em;
+  margin-right: 0.4em;
+}
