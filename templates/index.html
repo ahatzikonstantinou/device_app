@@ -99,7 +99,7 @@
 
         <div style="text-align: right;">
           <button type="submit" class="text-btn">Αποθήκευση</button>
-          <button type="button" class="text-btn danger" onclick="closeAddDeviceModal()">Κλείσιμο</button>
+          <button id="form-close-btn" type="button" class="text-btn danger" onclick="closeAddDeviceModal()">Κλείσιμο</button>
         </div>
       </form>
     </div>
@@ -117,6 +117,8 @@
   // });
 
   let allDevices = [];
+
+  let isEditing = false; // ή true όταν μπαίνεις σε edit mode
 
   function getUsedPins() {
     const used = new Set();
@@ -150,6 +152,34 @@
     const res = await fetch('/api/devices');
     const data = await res.json();
     allDevices = data;
+
+    //test data
+    const id = "1";
+    const name = 'Πιεστικό σπιτιού';
+
+    const pins = {
+      active: 1,
+      enabled: 2,
+      open: 3,
+      enable: 4,
+      override: 5
+    };
+
+    const mqtt = {
+      status: '/shelly/piestiko/spiti/status',
+      enable: '/shelly/piestiko/spiti/enable',
+      override: '/shelly/piestiko/spiti/override'
+    };
+
+    const device = {
+      id,
+      name,
+      pins,
+      mqtt
+    };
+
+    allDevices.push(device);
+
     const container = document.getElementById('devices-container');
     container.innerHTML = '';
 
@@ -161,7 +191,7 @@
       card.className = 'device-card';
 
       card.innerHTML = `
-        <div class="device-header" onclick="this.parentElement.classList.toggle('expanded')">
+        <div class="device-header" onclick="toggleCard(this)">
           <h3 class="device-title">${device.name}</h3>
           <span class="toggle-icon">▾</span>
         </div>
@@ -218,6 +248,7 @@
     if (res.ok) {
       showToast("Διαγράφηκε.");
       editingDeviceId = null;
+      exitEditMode();
       fetchDevices();
     } else {
       showToast("Σφάλμα διαγραφής.", 'error');
@@ -227,6 +258,7 @@
   let editingDeviceId = null;
 
   function editDevice(id) {
+    enterEditMode();
     document.getElementById('form-title').textContent = 'Επεξεργασία Συσκευής';
     const device = allDevices.find(d => d.id === id);
     
@@ -245,16 +277,10 @@
     editingDeviceId = id;
     form.querySelector('button[type="submit"]').textContent = 'Ενημέρωση';
     document.body.classList.add('show-detail');
-
-     // Responsive εμφάνιση
-    if (window.innerWidth <= 768) {
-      document.querySelector('.master').classList.add('hide');
-      document.querySelector('.detail').classList.add('show');
-      document.getElementById('backBtn').style.display = 'inline-block';
-    }
   }
 
   function addNewDevice() {
+    enterEditMode();
     editingDeviceId = null;
     const form = document.getElementById('add-device-form');
     form.querySelector('button[type="submit"]').textContent = 'Αποθήκευση';
@@ -263,14 +289,7 @@
     // Καθάρισε τη φόρμα
     document.getElementById('add-device-form').reset();
     document.getElementById('form-title').textContent = 'Προσθήκη Συσκευής';
-    document.getElementById('edit-indicator').style.display = 'none';
-
-    // Responsive εμφάνιση
-    if (window.innerWidth <= 768) {
-      document.querySelector('.master').classList.add('hide');
-      document.querySelector('.detail').classList.add('show');
-      document.getElementById('backBtn').style.display = 'inline-block';
-    }
+    document.getElementById('edit-indicator').style.display = 'none';    
   }
 
   document.getElementById('add-device-form').addEventListener('submit', async function (e) {
@@ -334,12 +353,7 @@
       setEditIndicator(null);
       fetchDevices();
       
-      // Responsive: Επιστροφή στο master view σε μικρή οθόνη
-      if (window.innerWidth <= 768) {
-        document.querySelector('.master').classList.remove('hide');
-        document.querySelector('.detail').classList.remove('show');
-        document.getElementById('backBtn').style.display = 'none';
-      }
+      exitEditMode();
     } else {
       const err = await res.text();
       showToast("Σφάλμα: " + err, 'error');
@@ -360,9 +374,12 @@
     }
   }
 
-  // document.getElementById('theme-toggle').addEventListener('click', () => {
-  //   document.documentElement.toggleAttribute('data-theme', 'dark');
-  // });
+  function toggleCard(el) {
+    const card = el.closest('.device-card');
+    if (!card.classList.contains('hide')) {
+      card.classList.toggle('expanded');
+    }
+  }
 
   fetchDevices();
   checkMQTTStatus();
@@ -398,49 +415,71 @@
 
   // Αρχική κατάσταση: σε μικρή οθόνη μόνο master
   function updateLayout() {
-    if (window.innerWidth <= 768) {
-      detailPane.classList.remove('show');
-      masterPane.classList.add('show');
-      backBtn.style.display = 'none';
+    const isSmallScreen = window.innerWidth <= 768;
+    const master = document.querySelector('.master');
+    const detail = document.querySelector('.detail');
+
+    if (isSmallScreen) {
+      if (isEditing) {
+        // Αν επεξεργάζεσαι, δείξε μόνο detail
+        master.classList.add('hide');
+        detail.classList.remove('hide');
+        backBtn.style.display = 'inline-block';
+      } else {
+        // Αν ΔΕΝ επεξεργάζεσαι, δείξε μόνο master
+        master.classList.remove('hide');
+        detail.classList.add('hide');
+        backBtn.style.display = 'none';
+      }
     } else {
-      detailPane.classList.add('show');
-      masterPane.classList.remove('hide');
-      backBtn.style.display = 'none';
+      // Σε μεγάλες οθόνες, δείχνεις και τα δύο πάντα
+      master.classList.remove('hide');
+      detail.classList.remove('hide');
     }
   }
 
   window.addEventListener('resize', updateLayout);
-  updateLayout();
 
-  // Όταν ο χρήστης επιλέγει συσκευή από τη λίστα (πρέπει να έχεις onclick εκεί)
-  function openDetail() {
-    if (window.innerWidth <= 768) {
-      masterPane.classList.add('hide');
-      detailPane.classList.add('show');
-      backBtn.style.display = 'inline-block';
-    }
+  function enterEditMode() {
+    isEditing = true;
+    updateLayout();
   }
 
+  function exitEditMode() {
+    isEditing = false;
+    updateLayout();
+  }
+  updateLayout();
   
   document.getElementById('edit-indicator').textContent = 'Προσθήκη νέας συσκευής';
   document.getElementById('edit-indicator').style.display = 'block';
 
-  function showMasterPane()
-  {
-    masterPane.classList.remove('hide');
-    detailPane.classList.remove('show');
-    backBtn.style.display = 'none';
-  }
-
   // Κουμπί επιστροφής
   backBtn.addEventListener('click', () => {
-    showMasterPane();
+    exitEditMode();
   });
 
   function closeAddDeviceModal() {
-    showMasterPane();
+    addNewDevice(); // reset the form
+    exitEditMode();
   }
 
+  function updateCloseButtonText() {
+    const btn = document.getElementById('form-close-btn');
+    if (!btn) return;
+    
+    if (window.innerWidth <= 768) {
+      btn.textContent = 'Κλείσιμο';
+    } else {
+      btn.textContent = 'Καθάρισμα';
+    }
+  }
+
+  // Εκτέλεση στην αρχή
+  updateCloseButtonText();
+
+  // Εκτέλεση όταν αλλάζει το μέγεθος του παραθύρου
+  window.addEventListener('resize', updateCloseButtonText);
 
   // // Έλεγχος αν υπάρχει αποθηκευμένη προτίμηση
   // function applyDarkMode(enabled) {
@@ -464,24 +503,6 @@
   //     applyDarkMode(!isDark);
   //   });
   // });
-
-  // Όταν οποιοδήποτε input μέσα στη σελίδα έχει focus, προσθέτουμε κλάση 'input-focused' στο body ή container
-  document.addEventListener('click', (e) => {
-    const deviceCard = e.target.closest('.device-card');
-    if (!deviceCard) return;
-
-    // Αν κλικ είναι στο header, toggle .expanded
-    if (e.target.closest('.device-header')) {
-      deviceCard.classList.toggle('expanded');
-      return;
-    }
-
-    // Αν κλικ εκτός input/textarea μέσα στην κάρτα, κλείσε τη detail
-    if (!e.target.closest('input, textarea, select')) {
-      deviceCard.classList.remove('expanded');
-    }
-  });
-
 
 
 </script>

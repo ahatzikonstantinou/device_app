@@ -209,28 +209,17 @@ button[type="button"]:hover {
   flex-wrap: wrap;
 }
 
- @media (max-width: 768px) {
-  .master-detail-container {
-    flex-direction: column;
-  }
+.master, .detail {
+  display: block;
+}
+
+.master.hide, .detail.hide {
+  display: none !important;
+}
+
+@media (min-width: 769px) {
+  .master,
   .detail {
-    display: none;
-  }
-  .detail.show {
-    display: block;
-  }
-  .master.show {
-    display: block;
-  }
-  .master {
-    display: block;
-  }
-  .master.hide {
-    display: none;
-  }
-  
-  /* Αν υπάρχει focus σε πεδίο, εμφάνισε τη detail πάντα */
-  body.input-focused .detail {
     display: block !important;
   }
 }
@@ -282,6 +271,10 @@ button[type="button"]:hover {
 
 .device-details {
   padding: 0 1.25rem 1rem;
+  display: none;
+}
+
+.device-card.expanded .device-details {
   display: block;
 }
 
@@ -336,10 +329,12 @@ button[type="button"]:hover {
 
 .mqtt-group .item {
   font-weight: 600;
+  justify-content: flex-start;
+  gap: 0.5rem;
 }
 
 .mqtt-group .item span{
-  font-weight: 500;
+  font-weight: normal;
 }
 
 .group.mqtt .mqtt-group h5 {
@@ -398,17 +393,6 @@ button[type="button"]:hover {
 .text-btn.danger:hover {
   background: rgba(211, 47, 47, 0.08);
 }
-
-/* Responsive behavior */
-/* @media (max-width: 768px) {
-  .device-card .device-details {
-    display: none;
-  }
-
-  .device-card.expanded .device-details {
-    display: block;
-  }
-} */
 
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
