@@ -167,13 +167,13 @@ def devices():
 
 @app.route('/api/devices/<device_id>', methods=['PUT', 'DELETE'])
 def update_device(device_id):
-    print(json.dumps(request.json, indent=4))
     device_list  = load_devices()
     device = next((d for d in device_list  if d['id'] == device_id), None)
     if not device:
         return jsonify({'error': 'Not found'}), 404
 
     if request.method == 'PUT':
+        print(json.dumps(request.json, indent=4)) #only PUT has request body
         data = request.json
         name = data['name']
         pins_in  = data['pins']
@@ -300,12 +300,12 @@ def set_gpio_output(pin):
     device_id = None
     pin_key = None
     for device in device_list:
-        device_id = device['id']
         for key, pin_info in device.get('pins', {}).items():
             if pin_info.get('pin') == pin:
+                device_id = device['id']
                 pin_key = key
                 break
-        if device_id is not None:
+        if device_id is not None and pin_key is not None:
             break
 
     if device_id is None or pin_key is None:

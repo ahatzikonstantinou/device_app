@@ -18,45 +18,45 @@ async function checkMQTTStatus() {
 }
 
 function enableMQTTSpanButtons() {
-  const topics = [
-    { id: 'mqtt-status-topic', isStatus: true },
-    { id: 'mqtt-enable-topic', sample: '1' },
-    { id: 'mqtt-override-topic', sample: '0' },
-    { id: 'mqtt-report_status-topic', sample: '' }
-  ];
+  const topicSamples = {
+    status: '{}',
+    enable: '1',
+    override: '0',
+    report_status: ''
+  };
 
-  topics.forEach(({ id, sample, isStatus }) => {
-    const span = document.getElementById(id);
-    const topic = span?.textContent.trim();
-    if (topic && topic !== '-') {
-      span.classList.add('text-btn');
-      span.style.cursor = 'pointer';
-      span.onclick = async () => {
-        if (isStatus) {
-          // Get device ID from closest card (or use a dataset)
-          const card = span.closest('.device-card');
-          const title = card?.querySelector('.device-title')?.textContent?.trim();
-          const device = allDevices.find(d => d.name === title);
+  document.querySelectorAll('.mqtt-topic').forEach(span => {
+    const topic = span.textContent.trim();
+    const type = span.dataset.topicType;
+    if (!topic || topic === '-') return;
 
-          if (device?.id) {
-            try {
-              const res = await fetch(`/api/devices/status/${device.id}`);
-              const json = await res.json();
-              const text = JSON.stringify(json, null, 2);
-              openMQTTModal(topic, text);
-            } catch (err) {
-              console.error('Failed to fetch device status:', err);
-              openMQTTModal(topic, '{}');
-            }
-          } else {
-            console.warn('Device not found for status topic');
+    span.classList.add('text-btn');
+    span.style.cursor = 'pointer';
+
+    span.onclick = async () => {
+      if (type === 'status') {
+        const card = span.closest('.device-card');
+        const title = card?.querySelector('.device-title')?.textContent?.trim();
+        const device = allDevices.find(d => d.name === title);
+
+        if (device?.id) {
+          try {
+            const res = await fetch(`/api/devices/status/${device.id}`);
+            const json = await res.json();
+            const text = JSON.stringify(json, null, 2);
+            openMQTTModal(topic, text);
+          } catch (err) {
+            console.error('Failed to fetch device status:', err);
             openMQTTModal(topic, '{}');
           }
         } else {
-          openMQTTModal(topic, sample);
+          console.warn('Device not found for status topic');
+          openMQTTModal(topic, '{}');
         }
-      };
-    }
+      } else {
+        openMQTTModal(topic, topicSamples[type] || '');
+      }
+    };
   });
 }
 
