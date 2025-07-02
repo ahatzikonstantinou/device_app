@@ -7,6 +7,9 @@ class DeviceProvider:
     def __init__(self, devices):
         self.devices = devices
 
+    def get_devices(self):
+        return self.devices
+    
     def update_devices(self, new_device_list):
         """Replace current device list and persist it."""
         self.devices = new_device_list

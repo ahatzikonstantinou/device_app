@@ -57,7 +57,7 @@ pip install --break-system-packages flask flask-babel paho-mqtt RPi.GPIO
 ```bash
 sudo apt update
 sudo apt install python3-pip
-pip3 install flask flask-babel flask_cors paho-mqtt RPi.GPIO
+pip3 install flask flask-babel flask_cors flask-socketio eventlet paho-mqtt RPi.GPIO
 ```
 
 ### 3. systemd Υπηρεσία

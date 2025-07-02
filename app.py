@@ -1,6 +1,10 @@
+import eventlet #this must come first before anything else
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, jsonify, abort
 from flask_babel import Babel, _
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 import uuid
 import json
 import os
@@ -9,6 +13,7 @@ from gpio_service import GPIOSupervisor
 from device_service import DeviceProvider
 
 app = Flask(__name__)
+socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
 CORS(app)
 babel = Babel()
 app.config['BABEL_DEFAULT_LOCALE'] = 'el'
@@ -19,6 +24,19 @@ CONFIG_FILE = 'config.json'
 
 supervisor = GPIOSupervisor()
 
+# Observer to emit pin change to frontend
+def emit_pin_change(device_id, pin_key, new_value):
+    device = device_provider.get_device_by_id(device_id)
+    if not device:
+        return
+    socketio.emit("pin_update", {
+        "device_id": device_id,
+        "device_name": device["name"],
+        "pin_key": pin_key,
+        "new_value": new_value
+    })
+
+supervisor.add_pin_change_observer(emit_pin_change)
 # --- Helper functions ---
 def is_name_unique(name, device_list, exclude_id=None):
     return all(device['name'].lower() != name.lower() or (exclude_id is not None and device['id'] == exclude_id) for device in device_list)
@@ -63,6 +81,7 @@ device_provider = DeviceProvider(load_devices())
 
 def save_devices(devices):
     device_provider.update_devices(devices)
+    mqtt_client.update_subscriptions()
     with open(DEVICE_FILE, 'w') as f:
         json.dump(devices, f, indent=2)
 
@@ -136,7 +155,6 @@ def devices():
         device_list .append(new_device)
         save_devices(device_list )
         supervisor.add_device(new_device)
-        mqtt_client.update_subscriptions(device_list)
 
         return jsonify({'status': 'created'}), 201
 
@@ -188,8 +206,24 @@ def update_device(device_id):
         supervisor.remove_device(device['id'])
 
     save_devices(device_list)
-    mqtt_client.update_subscriptions(device_list)
     return jsonify({'status': 'ok'})
+
+@app.route('/api/devices/status/<device_id>')
+def get_device_status(device_id):
+    device = supervisor.devices.get(device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+
+    # This will re-read input pins and return the device dict
+    updated_device = supervisor.read_input_pins(device)
+    pins_status = updated_device['pins']
+
+    # Only return the input pins' values
+    return jsonify({
+        'active': pins_status['active']['value'],
+        'enabled': pins_status['enabled']['value'],
+        'open': pins_status['open']['value']
+    })
 
 @app.route('/settings')
 def settings():
@@ -218,10 +252,7 @@ def api_mqtt():
 
         if config_changed:
             mqtt_client.update_config(new_config)
-
-            # Reload devices and update subscriptions to reflect any possible topic changes
-            device_list = load_devices()
-            mqtt_client.update_subscriptions(device_list)
+            mqtt_client.update_subscriptions(all=True)
 
         return jsonify({'status': 'updated'})
 
@@ -290,4 +321,5 @@ def set_gpio_output(pin):
 if __name__ == '__main__':
     mqtt_client.connect()
     supervisor.load_devices(load_devices())
-    app.run(host='0.0.0.0', port=5000)
+    #app.run(host='0.0.0.0', port=5000) #socketio.run covers this too
+    socketio.run(app, host="0.0.0.0", port=5000)

@@ -3,7 +3,6 @@ import threading
 import time
 import json
 
-import inspect #to debug callable
 
 # Note: 
 #  - device_provider must provide get_status(device_name) and get_publish_status_topic(device_name)
@@ -16,7 +15,6 @@ class MQTTService:
         self.reconnect_thread = threading.Thread(target=self._reconnect_loop, daemon=True)
         self.device_provider = device_provider
         self.on_message = on_message
-        print(f"on_message: {self.on_message.__qualname__}")
         self.client.on_message = self._on_message_wrapper
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
@@ -47,9 +45,7 @@ class MQTTService:
         print(f"Device:\n{json.dumps(device, indent=2)}")
         if command in ["enable", "override"]:
             # Notify all observers that message
-            print(f"on_message: {self.on_message.__qualname__}, is callable:{callable(self.on_message)}")
             if callable(self.on_message):
-                print("Found callable on_message")
                 try:
                     value = int(payload)
                     self.on_message(topic, command, value)
@@ -69,9 +65,8 @@ class MQTTService:
         if rc == 0:
             print("Connected to MQTT broker.")
             self.connected = True
-            # Κάνουμε subscribe σε όσα ήδη έχουμε στη λίστα
-            for topic in self.current_subscriptions:
-                self.client.subscribe(topic)
+            # Fetch all current topics and subscribe
+            self.update_subscriptions(all=True)
         else:
             print(f"Failed to connect to MQTT broker (code {rc})")
 
@@ -124,20 +119,24 @@ class MQTTService:
             self.connected = False
             # The service will reconnect by thread _reconnect_loop
 
-    def update_subscriptions(self, device_list):
+    def update_subscriptions(self, all = False):
         # Νέα topics από τις συσκευές
         new_topics = set()
-        for device in device_list:
+        for device in self.device_provider.get_devices():
             mqtt = device.get('mqtt', {})
             for key in ['enable', 'override', 'report_status']:
                 topic = mqtt.get(key)
                 if topic:
                     new_topics.add(topic)
 
-        # Υπολογίζουμε ποια topics πρέπει να αφαιρεθούν
-        topics_to_unsubscribe = self.current_subscriptions - new_topics
-        # Και ποια πρέπει να προστεθούν
-        topics_to_subscribe = new_topics - self.current_subscriptions
+        if all:
+            topics_to_subscribe = new_topics
+            topics_to_unsubscribe = new_topics
+        else:
+            # Υπολογίζουμε ποια topics πρέπει να αφαιρεθούν
+            topics_to_unsubscribe = self.current_subscriptions - new_topics
+            # Και ποια πρέπει να προστεθούν
+            topics_to_subscribe = new_topics - self.current_subscriptions
 
         # Αφαιρούμε τα παλιά που δεν χρειάζονται πια
         for topic in topics_to_unsubscribe:

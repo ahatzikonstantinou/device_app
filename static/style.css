@@ -412,7 +412,6 @@ button[type="button"]:hover {
   color: #1976d2;
   font-weight: 500;
   cursor: pointer;
-  padding: 0.5rem 0.75rem;
   border-radius: 4px;
   transition: background-color 0.2s, color 0.2s, background 0.2s;
 }

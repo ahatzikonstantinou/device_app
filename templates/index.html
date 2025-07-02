@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <script src="{{ url_for('static', filename='modal_mqtt.js') }}"></script>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
 
@@ -171,58 +172,76 @@
     return used;
   }
 
+  const socket = io({
+    reconnection: true,
+    reconnectionAttempts: 3,
+    reconnectionDelay: 1000,
+  });
+
+
+  socket.on("pin_update", (update) => {
+    const { device_id, pin_key, new_value } = update;
+
+    const span = document.getElementById(`${device_id}-${pin_key}`);
+    if (span) {
+      const pin = span.textContent.split('(')[0].trim();
+      span.textContent = `${pin} (${new_value})`;
+    }
+  });
+
+
   async function fetchDevices() {
     const res = await fetch('/api/devices');
     const data = await res.json();
     allDevices = data;
 
-    //test data
-    const id = "1";
-    const name = 'Πιεστικό σπιτιού';
+    // //test data
+    // const id = "1";
+    // const name = 'Πιεστικό σπιτιού';
 
-    const pins = {
-      active: 
-      {
-        pin: 1,
-        value: 1
-      },
-      enabled: 
-      {
-        pin: 2,
-        value: 0
-      },
-      open:  
-      {
-        pin: 3,
-        value: 1
-      },
-      enable:  
-      {
-        pin: 4,
-        value: 0
-      },
-      override:  
-      {
-        pin: 5,
-        value: 1
-      }
-    };
+    // const pins = {
+    //   active: 
+    //   {
+    //     pin: 1,
+    //     value: 1
+    //   },
+    //   enabled: 
+    //   {
+    //     pin: 2,
+    //     value: 0
+    //   },
+    //   open:  
+    //   {
+    //     pin: 3,
+    //     value: 1
+    //   },
+    //   enable:  
+    //   {
+    //     pin: 4,
+    //     value: 0
+    //   },
+    //   override:  
+    //   {
+    //     pin: 5,
+    //     value: 1
+    //   }
+    // };
 
-    const mqtt = {
-      status: '/alyki/piestiko/spiti/status',
-      enable: '/alyki/piestiko/spiti/enable',
-      override: '/alyki/piestiko/spiti/override',
-      report_status: '/alyki/piestiko/spiti/report_status'
-    };
+    // const mqtt = {
+    //   status: '/alyki/piestiko/spiti/status',
+    //   enable: '/alyki/piestiko/spiti/enable',
+    //   override: '/alyki/piestiko/spiti/override',
+    //   report_status: '/alyki/piestiko/spiti/report_status'
+    // };
 
-    const device = {
-      id,
-      name,
-      pins,
-      mqtt
-    };
+    // const device = {
+    //   id,
+    //   name,
+    //   pins,
+    //   mqtt
+    // };
 
-    allDevices.push(device);
+    // allDevices.push(device);
 
     const container = document.getElementById('devices-container');
     container.innerHTML = '';
@@ -246,20 +265,20 @@
             <div class="group">
               <div class="pin-group">
                 <h5>Status Pins</h5>
-                <div class="item">Active: <span>${p.active.pin} (${p.active.value})</span></div>
-                <div class="item">Enabled: <span>${p.enabled.pin} (${p.enabled.value})</span></div>
-                <div class="item">Open: <span>${p.open.pin} (${p.open.value})</span></div>
+                <div class="item">Active: <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
+                <div class="item">Enabled: <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
+                <div class="item">Open: <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
               </div>
 
               <div class="pin-group">
                 <h5>Control Pins</h5>
                 <div class="item">
                   <button class="text-btn" onclick="openPinModal(${p.enable.pin}, ${p.enable.value}, 'Enable')">Enable:</button>
-                  <span>${p.enable.pin} (${p.enable.value})</span>
+                  <span id="${device.id}-enable">${p.enable.pin} (${p.enable.value})</span>
                 </div>
                 <div class="item">
                   <button class="text-btn" onclick="openPinModal(${p.override.pin}, ${p.override.value}, 'Override')">Override:</button>
-                  <span>${p.override.pin} (${p.override.value})</span>
+                  <span id="${device.id}-override">${p.override.pin} (${p.override.value})</span>
                 </div>
               </div>
             </div>
