@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />  
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="{{ url_for('static', filename='modal_mqtt.js') }}"></script>
 </head>
 <body>
 
@@ -105,6 +106,11 @@
             <input type="text" id="mqtt_sub_override_topic" name="mqtt_sub_override_topic" placeholder=" " />
             <label for="mqtt_sub_override_topic">Subscribe Override Topic</label>
           </div>
+
+          <div class="form-group">
+            <input type="text" id="mqtt_sub_report_status_topic" name="mqtt_sub_report_status_topic" placeholder=" " />
+            <label for="mqtt_sub_report_status_topic">Report Status Topic</label>
+          </div>
         </fieldset>
 
         <div style="text-align: right;">
@@ -133,6 +139,21 @@
     </div>
   </div>
 </div>
+
+<!-- Modal dialog to test send MQTT messages-->
+<div id="mqtt-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h3 id="mqtt-modal-title">Αποστολή MQTT Μηνύματος</h3>
+    <p>Topic: <span id="mqtt-topic-display"></span></p>
+    <textarea id="mqtt-payload" rows="4" style="width: 100%; margin-top: 1rem;">{}</textarea>
+    <div id="mqtt-msg-response" style="margin-top: 1rem;"></div>
+    <div class="modal-buttons">
+      <button class="text-btn" onclick="sendMQTTMessage()">Αποστολή</button>
+      <button class="text-btn" onclick="closeMQTTModal()">Κλείσιμο</button>
+    </div>
+  </div>
+</div>
+
 
 <div id="toast-container"></div>
 
@@ -187,9 +208,10 @@
     };
 
     const mqtt = {
-      status: '/shelly/piestiko/spiti/status',
-      enable: '/shelly/piestiko/spiti/enable',
-      override: '/shelly/piestiko/spiti/override'
+      status: '/alyki/piestiko/spiti/status',
+      enable: '/alyki/piestiko/spiti/enable',
+      override: '/alyki/piestiko/spiti/override',
+      report_status: '/alyki/piestiko/spiti/report_status'
     };
 
     const device = {
@@ -247,12 +269,13 @@
             <div class="group mqtt">
               <div class="mqtt-group">
                 <h5>Publish Status Topic</h5>
-                <div class="item">Status: <span>${mqtt.status || '-'}</span></div>
+                <div class="item">Status: <span id="mqtt-status-topic" class="mqtt-topic">${mqtt.status || '-'}</span></div>
               </div>
               <div class="mqtt-group">
                 <h5>Subscribe Control Topics</h5>
-                <div class="item">Enable: <span>${mqtt.enable || '-'}</div>
-                <div class="item">Override: <span>${mqtt.override || '-'}</div>
+                <div class="item">Enable: <span id="mqtt-enable-topic" class="mqtt-topic">${mqtt.enable || '-'}</div>
+                <div class="item">Override: <span id="mqtt-override-topic" class="mqtt-topic">${mqtt.override || '-'}</div>
+                <div class="item">Report status: <span id="mqtt-report_status-topic" class="mqtt-topic">${mqtt.report_status || '-'}</div>
               </div>
             </div>
           </div>
@@ -304,6 +327,7 @@
     form.mqtt_pub_status_topic.value = device.mqtt.status;
     form.mqtt_sub_enable_topic.value = device.mqtt.enable;
     form.mqtt_sub_override_topic.value = device.mqtt.override;
+    form.mqtt_sub_report_status_topic.value = device.mqtt.report_status;
 
     editingDeviceId = id;
     form.querySelector('button[type="submit"]').textContent = 'Ενημέρωση';
@@ -345,7 +369,8 @@
     const mqtt = {
       status: form.get('mqtt_pub_status_topic'),
       enable: form.get('mqtt_sub_enable_topic'),
-      override: form.get('mqtt_sub_override_topic')
+      override: form.get('mqtt_sub_override_topic'),
+      report_status: form.get('mqtt_sub_report_status_topic')
     };
 
     if (
@@ -406,30 +431,17 @@
     }
   });
 
-  async function checkMQTTStatus() {
-    try {
-      const response = await fetch('/api/mqtt/status');
-      const data = await response.json();
-      const statusDiv = document.getElementById('mqtt-status');
-      statusDiv.textContent = 'MQTT Status: ' + (data.connected ? 'Connected' : 'Disconnected');
-      statusDiv.style.color = data.connected ? 'green' : 'red';
-    } catch {
-      const s = document.getElementById('mqtt-status');
-      s.textContent = 'MQTT Status: Error';
-      s.style.color = 'gray';
-    }
-  }
+  fetchDevices();
+  checkMQTTStatus();
+  setInterval(checkMQTTStatus, 5000);
 
+  
   function toggleCard(el) {
     const card = el.closest('.device-card');
     if (!card.classList.contains('hide')) {
       card.classList.toggle('expanded');
     }
   }
-
-  fetchDevices();
-  checkMQTTStatus();
-  setInterval(checkMQTTStatus, 5000);
 
   // // Dark mode toggle
   // document.getElementById('theme-toggle').addEventListener('click', () => {

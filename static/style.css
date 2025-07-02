@@ -441,8 +441,8 @@ button[type="button"]:hover {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0,0,0,0.5);
   z-index: 1000;
   display: flex;
@@ -456,7 +456,7 @@ button[type="button"]:hover {
   border-radius: 12px;
   max-width: 400px;
   width: 90%;
-  position: relative;
+  /* position: relative; */
 }
 
 .modal-buttons {
@@ -539,4 +539,14 @@ button[type="button"]:hover {
 {
   position: relative;
   pointer-events:auto
+}
+
+.mqtt-topic.text-btn {
+  color: #1976d2!important;
+  cursor: pointer;
+}
+
+.mqtt-topic.text-btn:hover {
+  text-decoration: underline;
+  background: none;
 }

@@ -101,6 +101,8 @@ def devices():
         device_list .append(new_device)
         save_devices(device_list )
         supervisor.add_device(new_device)
+        mqtt_client.update_subscriptions(device_list)
+
         return jsonify({'status': 'created'}), 201
 
     # GET: Για κάθε device, διάβασε τα input pins και αντικατέστησε το device
@@ -151,6 +153,7 @@ def update_device(device_id):
         supervisor.remove_device(device['id'])
 
     save_devices(device_list)
+    mqtt_client.update_subscriptions(device_list)
     return jsonify({'status': 'ok'})
 
 @app.route('/settings')
@@ -166,10 +169,25 @@ def api_mqtt():
             config = json.load(f)
             return jsonify(config)
     else:
-        config = request.json
-        with open(CONFIG_FILE, 'w') as f:
-            json.dump(config, f, indent=2)
-        mqtt_client.update_config(config)
+        new_config = request.json
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            old_config = json.load(f)
+
+        # Save new config file
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(new_config, f, indent=2)
+
+        # Check if MQTT connection params changed (ip, port, username, password)
+        relevant_keys = ['ip', 'port', 'username', 'password']
+        config_changed = any(old_config.get(k) != new_config.get(k) for k in relevant_keys)
+
+        if config_changed:
+            mqtt_client.update_config(new_config)
+
+            # Reload devices and update subscriptions to reflect any possible topic changes
+            device_list = load_devices()
+            mqtt_client.update_subscriptions(device_list)
+
         return jsonify({'status': 'updated'})
 
 @app.route('/api/mqtt/status')
@@ -190,6 +208,16 @@ def test_mqtt_connection():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
     
+@app.route('/api/mqtt/publish', methods=['POST'])
+def publish_mqtt():
+    data = request.json
+    topic = data.get('topic')
+    payload = data.get('payload')
+    if not topic or payload is None:
+        return jsonify({'error': 'Missing topic or payload'}), 400
+
+    mqtt_client.publish(topic, payload)
+    return jsonify({'status': 'published'})
 
 @app.route('/gpio/<int:pin>', methods=['PUT'])
 def set_gpio_output(pin):
