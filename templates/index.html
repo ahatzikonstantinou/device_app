@@ -159,6 +159,7 @@
 
 <script>
   let allDevices = [];
+  let expandedDeviceId = null;
 
   let isEditing = false; // ή true όταν μπαίνεις σε edit mode
 
@@ -273,9 +274,9 @@
               </div>
               <div class="mqtt-group">
                 <h5>Subscribe Control Topics</h5>
-                <div class="item">Enable: <span id="mqtt-enable-topic" class="mqtt-topic">${mqtt.enable || '-'}</div>
-                <div class="item">Override: <span id="mqtt-override-topic" class="mqtt-topic">${mqtt.override || '-'}</div>
-                <div class="item">Report status: <span id="mqtt-report_status-topic" class="mqtt-topic">${mqtt.report_status || '-'}</div>
+                <div class="item">Enable: <span id="mqtt-enable-topic" class="mqtt-topic">${mqtt.enable || '-'}</span></div>
+                <div class="item">Override: <span id="mqtt-override-topic" class="mqtt-topic">${mqtt.override || '-'}</span></div>
+                <div class="item">Report status: <span id="mqtt-report_status-topic" class="mqtt-topic">${mqtt.report_status || '-'}</span></div>
               </div>
             </div>
           </div>

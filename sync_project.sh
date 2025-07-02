@@ -43,11 +43,10 @@ SOURCE_FOLDERS=(
 SOURCE_FILES=(
     "app.py"
     "device_app.service"
-    "devices.json"
+    "device_service.py"
     "gpio_service.py"
     "mqtt_service.py"
     "README.md"    
-    "config.json"
 )
 
 # Copy files to Raspberry Pi using rsync

@@ -4,8 +4,9 @@ from flask_cors import CORS
 import uuid
 import json
 import os
-from mqtt_service import mqtt_client
+from mqtt_service import MQTTService
 from gpio_service import GPIOSupervisor
+from device_service import DeviceProvider
 
 app = Flask(__name__)
 CORS(app)
@@ -58,7 +59,10 @@ def load_devices():
     with open(DEVICE_FILE) as f:
         return json.load(f)
 
+device_provider = DeviceProvider(load_devices())
+
 def save_devices(devices):
+    device_provider.update_devices(devices)
     with open(DEVICE_FILE, 'w') as f:
         json.dump(devices, f, indent=2)
 
@@ -66,6 +70,37 @@ def get_locale():
     return request.args.get('lang') or 'el'
 
 babel.init_app(app, locale_selector=get_locale)
+
+def execute_command_on_device(mqtt_topic, command, value):
+    device = device_provider.get_device_by_topic(mqtt_topic)
+    if not device:
+        raise ValueError(f"MQTT observer: No device found for mqtt topic '{mqtt_topic}'.")
+    # command is "enable" or "override" so it is the pin_key
+    supervisor.set_output_value(device['id'], command, value)
+    
+with open('config.json', 'r', encoding='utf-8') as f:
+    config = json.load(f)
+mqtt_client = MQTTService(config, device_provider, execute_command_on_device)
+
+#Update device data and save file
+def on_pin_change_update_device(device_id, pin_key, new_value):
+    device_list  = load_devices()
+    device = next((d for d in device_list  if d['id'] == device_id), None)
+    if not device:
+        print(f"Device {device_id} not found!")
+        return
+    if pin_key in device['pins']:
+        device['pins'][pin_key]['value'] = new_value
+
+        save_devices(device_list)
+        print(f"Updated device {device_id} pin {pin_key} to {new_value} and saved devices.json")
+        
+        mqtt_client.publish(device['mqtt']['status'], json.dumps(device['pins'], indent=2))
+        print(f"Published status update {device['mqtt']['status']}: {json.dumps(device['pins'], indent=2)}")
+    else:
+        print(f"Pin key {pin_key} not found in device {device_id}")
+
+supervisor.add_pin_change_observer(on_pin_change_update_device)
 
 @app.route('/')
 def index():
@@ -230,7 +265,22 @@ def set_gpio_output(pin):
     if value not in [0, 1]:
         return jsonify({'success': False, 'error': '"value" must be 0 or 1'}), 400
 
-    result = supervisor.set_output_value(pin, value)
+    device_list  = load_devices()
+    device_id = None
+    pin_key = None
+    for device in device_list:
+        device_id = device['id']
+        for key, pin_info in device.get('pins', {}).items():
+            if pin_info.get('pin') == pin:
+                pin_key = key
+                break
+        if device_id is not None:
+            break
+
+    if device_id is None or pin_key is None:
+        return jsonify({'success': False, 'error': f'Pin {pin} not found in any device'}), 404
+
+    result = supervisor.set_output_value(device_id, pin_key, value)
 
     if result['success']:
         return jsonify(result)

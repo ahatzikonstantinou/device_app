@@ -20,8 +20,9 @@ async function checkMQTTStatus() {
 function enableMQTTSpanButtons() {
     const topics = [
       { id: 'mqtt-status-topic', sample: '{"active": "1", "enabled": 1, "open": 0}' },
-      { id: 'mqtt-enable-topic', sample: '{"enable": false}' },
-      { id: 'mqtt-override-topic', sample: '{"override": true}' }
+      { id: 'mqtt-enable-topic', sample: '1' },
+      { id: 'mqtt-override-topic', sample: '0' },
+      { id: 'mqtt-report_status-topic', sample: '{}' }
     ];
 
     topics.forEach(({ id, sample }) => {

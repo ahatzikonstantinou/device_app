@@ -2,15 +2,26 @@ import RPi.GPIO as GPIO
 import threading
 import time
 import json
-from mqtt_service import mqtt_client
 
 GPIO.setmode(GPIO.BCM)
 
 class GPIOSupervisor:
-    def __init__(self):
+    def __init__(self, on_pin_change=None):
         self.devices = {}
+        
+        # Allow multiple observers, default to empty list if None
+        self.on_pin_change = on_pin_change if on_pin_change is not None else []
+
         self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
         self.monitor_thread.start()
+
+    def add_pin_change_observer(self, callback):
+        if callable(callback):
+            self.on_pin_change.append(callback)
+
+    def remove_pin_change_observer(self, callback):
+        if callback in self.on_pin_change:
+            self.on_pin_change.remove(callback)
 
     def load_devices(self, devices):
         for device in devices:
@@ -23,9 +34,9 @@ class GPIOSupervisor:
         GPIO.setup(pins['enabled']['pin'], GPIO.IN)
         GPIO.setup(pins['open']['pin'], GPIO.IN)
         GPIO.setup(pins['enable']['pin'], GPIO.OUT)
-        self.set_output_value(pins['enable']['pin'], pins['enable']['value'])
+        self.set_output_value(device['id'], 'enable', pins['enable']['value'])
         GPIO.setup(pins['override']['pin'], GPIO.OUT)
-        self.set_output_value(pins['override']['pin'], pins['override']['value'])
+        self.set_output_value(device['id'], 'override', pins['override']['value'])
 
 
     def update_device(self, device):
@@ -56,25 +67,72 @@ class GPIOSupervisor:
         device['pins'] = new_pins
         return device
     
-    def set_output_value(self, pin, value):
+    def set_output_value(self, device_id, pin_key, value):
         """
         Set value (0 or 1) to the given GPIO output pin.
         If the pin is not configured as output, return error.
         """
-        try:
-            direction = GPIO.gpio_function(pin)
-            if direction != GPIO.OUT:
-                raise RuntimeError(f"GPIO {pin} is not configured as OUTPUT (mode={direction})")
+        device = self.devices.get(device_id)
+        if not device:
+            return {"success": False, "error": "Device not found"}
 
-            GPIO.output(pin, value)
-            return {"success": True, "pin": pin, "value_set": value}
+        pin_info = device['pins'].get(pin_key)
+        if not pin_info:
+            return {"success": False, "error": f"Pin {pin_key} not found"}
+
+        pin_num = pin_info['pin']
+
+        try:
+            direction = GPIO.gpio_function(pin_num)
+            if direction != GPIO.OUT:
+                raise RuntimeError(f"GPIO {pin_num} is not configured as OUTPUT (mode={direction})")
+
+            GPIO.output(pin_num, value)
+            # Update in-memory
+            device['pins'][pin_key]['value'] = value
+
+            # Notify all observers that pin changed
+            for observer in self.on_pin_change:
+                try:
+                    observer(device_id, pin_key, value)
+                except Exception as e:
+                    print(f"Error in on_pin_change observer: {e}")
+
+            return {"success": True, "pin": pin_num, "value_set": value}
 
         except Exception as e:
-            return {"success": False, "pin": pin, "error": str(e)}
+            return {"success": False, "pin": pin_num, "error": str(e)}
         
     def monitor_loop(self):
+        input_pins_keys = ['active', 'enabled', 'open']
+
         while True:
-            #for id, device in self.devices.items():
-                #status = GPIO.input(device['pins']['status'])
-                #mqtt_client.publish(f"devices/{name}/status", json.dumps({"status": status}))
+            for device_id, device in self.devices.items():
+                pins = device.get('pins', {})
+
+                for key in input_pins_keys:
+                    pin_info = pins.get(key)
+                    if not pin_info:
+                        continue
+
+                    pin_num = pin_info['pin']
+                    try:
+                        current_value = GPIO.input(pin_num)
+                    except Exception as e:
+                        print(f"Error reading GPIO pin {pin_num}: {e}")
+                        continue
+
+                    # Compare with last known value
+                    last_value = pin_info.get('value')
+                    if current_value != last_value:
+                        # Update in-memory value
+                        self.devices[device_id]['pins'][key]['value'] = current_value
+
+                        # Notify observers
+                        for observer in self.on_pin_change:
+                            try:
+                                observer(device_id, key, current_value)
+                            except Exception as e:
+                                print(f"Error in on_pin_change observer: {e}")
+
             time.sleep(1)

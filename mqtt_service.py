@@ -3,21 +3,67 @@ import threading
 import time
 import json
 
+import inspect #to debug callable
+
+# Note: 
+#  - device_provider must provide get_status(device_name) and get_publish_status_topic(device_name)
+#  - on_message must be like on_message(mqtt_topic, command, value)
 class MQTTService:
-    def __init__(self, config, on_message=None):
+    def __init__(self, config, device_provider, on_message = None):
         self.config = config
         self.client = mqtt.Client()
         self.connected = False
-        self.on_message_callback = on_message
         self.reconnect_thread = threading.Thread(target=self._reconnect_loop, daemon=True)
-
-        if self.on_message_callback:
-            self.client.on_message = self.on_message_callback
+        self.device_provider = device_provider
+        self.on_message = on_message
+        print(f"on_message: {self.on_message.__qualname__}")
+        self.client.on_message = self._on_message_wrapper
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
 
         # Κρατάμε set με τρέχοντα subscriptions
         self.current_subscriptions = set()
+
+    def _on_message_wrapper(self, client, userdata, msg):
+        topic = msg.topic
+        payload = msg.payload.decode()
+        print(f"Received MQTT message on {topic}: {payload}")
+
+        if topic.endswith("/enable"):
+            command = "enable"
+        elif topic.endswith("/override"):
+            command = "override"
+        elif topic.endswith("/report_status"):
+            command = "report_status"
+        else:
+            print(f"[MQTT] Unknown topic '{topic}' — ignoring.")
+            return
+        print(f"Command is {command}")
+
+        device = self.device_provider.get_device_by_topic(topic)
+        if not device:
+            raise ValueError(f"MQTT service: No device found for mqtt topic '{topic}'.")
+        
+        print(f"Device:\n{json.dumps(device, indent=2)}")
+        if command in ["enable", "override"]:
+            # Notify all observers that message
+            print(f"on_message: {self.on_message.__qualname__}, is callable:{callable(self.on_message)}")
+            if callable(self.on_message):
+                print("Found callable on_message")
+                try:
+                    value = int(payload)
+                    self.on_message(topic, command, value)
+                except ValueError:
+                    print(f"Ignoring invalid payload for {topic}, {command}: {payload}")
+        elif command == "report_status":
+            # Respond by publishing current status
+            status = json.dumps(self.device_provider.get_status(device), indent=2)
+            publish_status_topic = self.device_provider.get_publish_status_topic(device)
+
+            try:
+                self.publish(publish_status_topic, status)
+            except Exception as e:
+                print(f"Error handling report_status for {publish_status_topic}: {e}")
 
     def _on_connect(self, client, userdata, flags, rc):
         if rc == 0:
@@ -105,8 +151,3 @@ class MQTTService:
 
         # Ενημερώνουμε το set των τρεχόντων subscriptions
         self.current_subscriptions = new_topics
-
-
-with open('config.json', 'r', encoding='utf-8') as f:
-    config = json.load(f)
-mqtt_client = MQTTService(config)
