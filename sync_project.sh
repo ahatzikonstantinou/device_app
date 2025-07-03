@@ -47,6 +47,7 @@ SOURCE_FILES=(
     "gpio_service.py"
     "mqtt_service.py"
     "README.md"    
+    "babel.cfg"
 )
 
 # Copy files to Raspberry Pi using rsync

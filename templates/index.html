@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="{{ get_locale() }}">
 <head>
   <meta charset="UTF-8">
-  <title>Device Manager</title>
+  <title>{{ _('Device Manager') }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />  
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
@@ -20,37 +20,37 @@
           <span></span>
           <span></span>
         </div>
-        <div class="page-title">Device Manager</div>
+        <div class="page-title">{{ _('Device Manager') }}</div>
       </div>
-      <div id="mqtt-status">MQTT Status: Unknown</div>
+      <div id="mqtt-status">{{ _('MQTT Status: Unknown') }}</div>
     </div>
 
     <div class="menu-overlay" id="menu-overlay"></div>
     <ul id="menu" class="menu">
-      <li><a href="/" class="active">Αρχική</a></li>
-      <li><a href="/settings">Ρυθμίσεις</a></li>
+      <li><a href="/" class="active">{{ _('Αρχική') }}</a></li>
+      <li><a href="/settings">{{ _('Ρυθμίσεις') }}</a></li>
     </ul>
   </nav>
 
 <div class="container master-detail-container">
-    <div class="master" role="region" aria-label="Λίστα Συσκευών" style="flex:1; min-width: 280px; padding-right:1rem; border-right: 1px solid #ddd;">
-      <h1>Devices</h1>
+    <div class="master" role="region" aria-label="{{ _('Devices') }}" style="flex:1; min-width: 280px; padding-right:1rem; border-right: 1px solid #ddd;">
+      <h1>{{ _('Devices') }}</h1>
       <div class="devices-header">
         <h2>Υπάρχουσες Συσκευές</h2>
-        <button type="button" class="text-btn" onclick="addNewDevice()"><span class="material-symbols-outlined">add</span>Προσθήκη Συσκευής</button>
+        <button type="button" class="text-btn" onclick="addNewDevice()"><span class="material-symbols-outlined">add</span>{{ _("Προσθήκη Συσκευής") }}</button>
       </div>
       <div id="devices-container"></div>
     </div>
 
-    <div class="detail" role="region" aria-label="Φόρμα Συσκευής" style="flex:2; min-width: 320px; padding-left:1rem;">
-      <h2 id="form-title">Προσθήκη Συσκευής</h2>
+    <div class="detail" role="region" aria-label="{{ _('Φόρμα Συσκευής') }}" style="flex:2; min-width: 320px; padding-left:1rem;">
+      <h2 id="form-title">{{ _('Προσθήκη Συσκευής') }}</h2>
       <div id="edit-indicator" style="display:none; margin-bottom: 10px; font-weight: bold; color: var(--primary-dark);"></div>
-      <button type="button" id="backBtn" class="text-btn" style="margin-bottom: 1rem; display:none;"><span class="material-symbols-outlined">arrow_back</span>Επιστροφή</button>
+      <button type="button" id="backBtn" class="text-btn" style="margin-bottom: 1rem; display:none;"><span class="material-symbols-outlined">arrow_back</span>{{ _('Επιστροφή') }}</button>
 
       <form id="add-device-form">
         <div class="form-group">
           <input type="text" id="deviceName" name="name" required placeholder=" " />
-          <label for="deviceName">Όνομα Συσκευής</label>
+          <label for="deviceName">{{ _('Όνομα Συσκευής') }}</label>
         </div>
 
         <fieldset>
@@ -58,22 +58,22 @@
 
           <div class="form-group">
             <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
-            <label for="pin_active">Pin: Active</label>
+            <label for="pin_active">{{ _('Pin: Active') }}</label>
           </div>
 
           <div class="form-group">
             <input type="number" id="pin_enabled" name="pin_enabled" required placeholder=" " />
-            <label for="pin_enabled">Pin: Enabled</label>
+            <label for="pin_enabled">{{ _('Pin: Enabled') }}</label>
           </div>
 
           <div class="form-group">
             <input type="number" id="pin_open" name="pin_open" required placeholder=" " />
-            <label for="pin_open">Pin: Open</label>
+            <label for="pin_open">{{ _('Pin: Open') }}</label>
           </div>
 
           <div class="form-inline-pin">
             <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
-            <label for="pin_enable">Output Pin: Enable</label>
+            <label for="pin_enable">{{ _('Output Pin: Enable') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_enable_value" value="0" /> 0</label>
               <label><input type="radio" name="pin_enable_value" value="1" /> 1</label>
@@ -82,7 +82,7 @@
 
           <div class="form-inline-pin">
             <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
-            <label for="pin_override">Output Pin: Override</label>
+            <label for="pin_override">{{ _('Output Pin: Override') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_override_value" value="0" /> 0</label>
               <label><input type="radio" name="pin_override_value" value="1" /> 1</label>
@@ -91,32 +91,32 @@
         </fieldset>
 
         <fieldset>
-          <legend>MQTT</legend>
+          <legend>{{ _('MQTT') }}</legend>
 
           <div class="form-group">
             <input type="text" id="mqtt_pub_status_topic" name="mqtt_pub_status_topic" placeholder=" " />
-            <label for="mqtt_pub_status_topic">Publish Status Topic</label>
+            <label for="mqtt_pub_status_topic">{{ _('Publish Status Topic') }}</label>
           </div>
 
           <div class="form-group">
             <input type="text" id="mqtt_sub_enable_topic" name="mqtt_sub_enable_topic" placeholder=" " />
-            <label for="mqtt_sub_enable_topic">Subscribe Enable Topic</label>
+            <label for="mqtt_sub_enable_topic">{{ _('Subscribe Enable Topic') }}</label>
           </div>
 
           <div class="form-group">
             <input type="text" id="mqtt_sub_override_topic" name="mqtt_sub_override_topic" placeholder=" " />
-            <label for="mqtt_sub_override_topic">Subscribe Override Topic</label>
+            <label for="mqtt_sub_override_topic">{{ _('Subscribe Override Topic') }}</label>
           </div>
 
           <div class="form-group">
             <input type="text" id="mqtt_sub_report_status_topic" name="mqtt_sub_report_status_topic" placeholder=" " />
-            <label for="mqtt_sub_report_status_topic">Report Status Topic</label>
+            <label for="mqtt_sub_report_status_topic">{{ _('Report Status Topic') }}</label>
           </div>
         </fieldset>
 
         <div style="text-align: right;">
-          <button type="submit" class="text-btn">Αποθήκευση</button>
-          <button id="form-close-btn" type="button" class="text-btn danger" onclick="closeAddDeviceModal()">Κλείσιμο</button>
+          <button type="submit" class="text-btn">{{ _('Αποθήκευση') }}</button>
+          <button id="form-close-btn" type="button" class="text-btn danger" onclick="closeAddDeviceModal()">{{ _('Κλείσιμο') }}</button>
         </div>
       </form>
     </div>
@@ -126,8 +126,8 @@
 <!-- Modal dialog to set Enable and Override pins-->
 <div id="pin-modal" class="modal" style="display:none;">
   <div class="modal-content">
-    <h3 id="modal-title">Set Pin Value</h3>
-    <p>GPIO ID: <span id="gpio-id"></span></p>
+    <h3 id="modal-title">{{ _('Set Pin Value') }}</h3>
+    <p>{{ _('GPIO ID:') }} <span id="gpio-id"></span></p>
     <form id="pin-form">
       <label><input type="radio" name="pin-value" value="0" checked> 0</label>
       <label><input type="radio" name="pin-value" value="1"> 1</label>
@@ -135,8 +135,8 @@
     <div id="response-msg" style="margin-top: 1rem;"></div>
     <div id="loader" class="loader" style="display: none;"></div>
     <div class="modal-buttons">
-      <button id="set-pin-btn" class="text-btn" onclick="submitPinValue()" disabled>Set</button>
-      <button class="text-btn" onclick="closePinModal()">Κλείσιμο</button>
+      <button id="set-pin-btn" class="text-btn" onclick="submitPinValue()" disabled>{{ _('Set') }}</button>
+      <button class="text-btn" onclick="closePinModal()">{{ _('Κλείσιμο') }}</button>
     </div>
   </div>
 </div>
@@ -144,13 +144,13 @@
 <!-- Modal dialog to test send MQTT messages-->
 <div id="mqtt-modal" class="modal" style="display: none;">
   <div class="modal-content">
-    <h3 id="mqtt-modal-title">Αποστολή MQTT Μηνύματος</h3>
+    <h3 id="mqtt-modal-title">{{ _('Αποστολή MQTT Μηνύματος') }}</h3>
     <p>Topic: <span id="mqtt-topic-display"></span></p>
     <textarea id="mqtt-payload" rows="4" style="width: 100%; margin-top: 1rem;">{}</textarea>
     <div id="mqtt-msg-response" style="margin-top: 1rem;"></div>
     <div class="modal-buttons">
-      <button class="text-btn" onclick="sendMQTTMessage()">Αποστολή</button>
-      <button class="text-btn" onclick="closeMQTTModal()">Κλείσιμο</button>
+      <button class="text-btn" onclick="sendMQTTMessage()">{{ _('Αποστολή') }}</button>
+      <button class="text-btn" onclick="closeMQTTModal()">{{ _('Κλείσιμο') }}</button>
     </div>
   </div>
 </div>
@@ -261,23 +261,23 @@
 
         <div class="device-details">
           <div class="device-section">
-            <h4 class="section-title">GPIO Pins</h4>
+            <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
             <div class="group">
               <div class="pin-group">
-                <h5>Status Pins</h5>
-                <div class="item">Active: <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
-                <div class="item">Enabled: <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
-                <div class="item">Open: <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
+                <h5>{{ _('Status Pins') }}</h5>
+                <div class="item">{{ _('Active:') }} <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
+                <div class="item">{{ _('Enabled:') }} <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
+                <div class="item">{{ _('Open:') }} <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
               </div>
 
               <div class="pin-group">
-                <h5>Control Pins</h5>
+                <h5>{{ _('Control Pins') }}</h5>
                 <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.enable.pin}, ${p.enable.value}, 'Enable')">Enable:</button>
+                  <button class="text-btn" onclick="openPinModal(${p.enable.pin}, ${p.enable.value}, 'Enable')">{{ _('Enable:') }}</button>
                   <span id="${device.id}-enable">${p.enable.pin} (${p.enable.value})</span>
                 </div>
                 <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.override.pin}, ${p.override.value}, 'Override')">Override:</button>
+                  <button class="text-btn" onclick="openPinModal(${p.override.pin}, ${p.override.value}, 'Override')">{{ _('Override:') }}</button>
                   <span id="${device.id}-override">${p.override.pin} (${p.override.value})</span>
                 </div>
               </div>
@@ -285,24 +285,24 @@
           </div>
           <hr>
           <div class="device-section">
-            <h4 class="section-title">MQTT</h4>
+            <h4 class="section-title">{{ _('MQTT') }}</h4>
             <div class="group mqtt">
               <div class="mqtt-group">
-                <h5>Publish Status Topic</h5>
-                <div class="item">Status: <span class="mqtt-topic" data-topic-type="status">${mqtt.status || '-'}</span></div>
+                <h5>{{ _('Publish Status Topic') }}</h5>
+                <div class="item">{{ _('Status:') }} <span class="mqtt-topic" data-topic-type="status">${mqtt.status || '-'}</span></div>
               </div>
               <div class="mqtt-group">
-                <h5>Subscribe Control Topics</h5>
-                <div class="item">Enable: <span class="mqtt-topic" data-topic-type="enable">${mqtt.enable || '-'}</span></div>
-                <div class="item">Override: <span class="mqtt-topic" data-topic-type="override">${mqtt.override || '-'}</span></div>
-                <div class="item">Report status: <span class="mqtt-topic" data-topic-type="report_status">${mqtt.report_status || '-'}</span></div>
+                <h5>{{ _('Subscribe Control Topics') }}</h5>
+                <div class="item">{{ _('Enable:') }} <span class="mqtt-topic" data-topic-type="enable">${mqtt.enable || '-'}</span></div>
+                <div class="item">{{ _('Override:') }} <span class="mqtt-topic" data-topic-type="override">${mqtt.override || '-'}</span></div>
+                <div class="item">{{ _('Report status:') }} <span class="mqtt-topic" data-topic-type="report_status">${mqtt.report_status || '-'}</span></div>
               </div>
             </div>
           </div>
 
           <div class="device-buttons">
-            <button class="text-btn" onclick="editDevice('${device.id}')">Επεξεργασία</button>
-            <button class="text-btn danger" onclick="deleteDevice('${device.id}')">Διαγραφή</button>
+            <button class="text-btn" onclick="editDevice('${device.id}')">{{ _('Επεξεργασία') }}</button>
+            <button class="text-btn danger" onclick="deleteDevice('${device.id}')">{{ _('Διαγραφή') }}</button>
           </div>
         </div>
       `;
@@ -313,15 +313,15 @@
   }
 
   async function deleteDevice(id) {
-    if (!confirm('Να διαγραφεί η συσκευή;')) return;
+    if (!confirm('{{ _("Να διαγραφεί η συσκευή;") }}')) return;
     const res = await fetch(`/api/devices/${id}`, { method: 'DELETE' });
     if (res.ok) {
-      showToast("Διαγράφηκε.");
+      showToast("{{ _('Διαγράφηκε') }}.");
       editingDeviceId = null;
       exitEditMode();
       fetchDevices();
     } else {
-      showToast("Σφάλμα διαγραφής.", 'error');
+      showToast("{{ _('Σφάλμα διαγραφής.') }}", 'error');
     }
   }
 
@@ -329,7 +329,7 @@
 
   function editDevice(id) {
     enterEditMode();
-    document.getElementById('form-title').textContent = 'Επεξεργασία Συσκευής';
+    document.getElementById('form-title').textContent = '{{ _("Επεξεργασία Συσκευής") }}';
     const device = allDevices.find(d => d.id === id);
     
     setEditIndicator(device.name);
@@ -352,7 +352,7 @@
     form.querySelector(`input[name="pin_override_value"][value="${device.pins.override.value}"]`).checked = true;
 
     editingDeviceId = id;
-    form.querySelector('button[type="submit"]').textContent = 'Ενημέρωση';
+    form.querySelector('button[type="submit"]').textContent = '{{ _("Ενημέρωση") }}';
     document.body.classList.add('show-detail');
   }
 
@@ -360,12 +360,12 @@
     enterEditMode();
     editingDeviceId = null;
     const form = document.getElementById('add-device-form');
-    form.querySelector('button[type="submit"]').textContent = 'Αποθήκευση';
+    form.querySelector('button[type="submit"]').textContent = '{{ _("Αποθήκευση") }}';
     document.body.classList.add('show-detail');
 
     // Καθάρισε τη φόρμα
     document.getElementById('add-device-form').reset();
-    document.getElementById('form-title').textContent = 'Προσθήκη Συσκευής';
+    document.getElementById('form-title').textContent = '{{ _("Προσθήκη Συσκευής") }}';
     document.getElementById('edit-indicator').style.display = 'none';    
   }
 
@@ -405,7 +405,7 @@
       isNaN(pins.override.pin) ||
       isNaN(pins.override.value)
     ) {
-      showToast("Συμπλήρωσε όλα τα πεδία σωστά.", 'error');
+      showToast("{{ _('Συμπλήρωσε όλα τα πεδία σωστά.') }}", 'error');
       return;
     }
 
@@ -431,7 +431,9 @@
         return used.has(pinNum);
       });
       if (conflict) {
-        showToast(`Το Pin ${conflict} χρησιμοποιείται ήδη.`, 'error');
+        const msgTemplate = `{{ _('Το Pin %%\(conflict\)s χρησιμοποιείται ήδη.') }}`;
+        const msg = msgTemplate.replace('%(conflict)s', conflict);
+        showToast(msg, 'error');
         return;
       }
 
@@ -444,7 +446,7 @@
 
     if (res.ok) {
       this.reset();
-      showToast(editingDeviceId ? "Η συσκευή αποθηκεύθηκε!" : "Η συσκευή προστέθηκε!");
+      showToast(editingDeviceId ? "{{ _('Η συσκευή αποθηκεύθηκε!') }}" : "{{ _('Η συσκευή προστέθηκε!') }}");
       editingDeviceId = null;
       setEditIndicator(null);
       fetchDevices();
@@ -484,7 +486,8 @@
   function setEditIndicator(deviceName) {
     const indicator = document.getElementById('edit-indicator');
     if (deviceName) {
-      indicator.textContent = `Επεξεργάζεσαι τη συσκευή "${deviceName}"`;
+      const msgTemplate = `{{ _('Επεξεργάζεσαι τη συσκευή "%%\(deviceName\)s"') }}`;
+      indicator.textContent = msgTemplate.replace('%(deviceName)s', deviceName);      
       indicator.style.display = 'block';
     } else {
       indicator.style.display = 'none';
@@ -534,7 +537,7 @@
   }
   updateLayout();
   
-  document.getElementById('edit-indicator').textContent = 'Προσθήκη νέας συσκευής';
+  document.getElementById('edit-indicator').textContent = '{{ _("Προσθήκη νέας συσκευής") }}';
   document.getElementById('edit-indicator').style.display = 'block';
 
   // Κουμπί επιστροφής

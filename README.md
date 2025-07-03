@@ -34,7 +34,7 @@ sudo apt install python3-pip python3-venv -y
 cd /home/pi/my_device_app
 python3 -m venv venv
 source venv/bin/activate
-pip install flask flask-babel flask-cors paho-mqtt RPi.GPIO 
+pip install flask flask-babel flask-cors flask-socketio eventlet paho-mqtt RPi.GPIO 
 ```
 
 Για χρήση με systemd, αντικατέστησε το ExecStart στο device_app.service με:
@@ -140,6 +140,8 @@ translations/el/LC_MESSAGES/messages.po
 - `static/app.js`: Web GUI JavaScript
 - `translations/`: Μεταφράσεις
 - `device_app.service`: systemd μονάδα
+- `device.service`: Διαχείριση συσκευών
+- `babel.cfg`: Παραμετροποίηση Babel για μεταφράσεις
 
 ---
 
@@ -184,7 +186,8 @@ pip install Babel
 Αν π.χ. θέλεις να προσθέσεις Γαλλικά (`fr`):
 
 ```bash
-pybabel extract -F babel.cfg -o messages.pot .
+#pybabel extract -F babel.cfg -o messages.pot . <- θα διαβάσει και το folder του python virtual environment (venv)
+pybabel extract -F babel.cfg -o messages.pot . --ignore-dirs=venv
 pybabel init -i messages.pot -d translations -l fr
 ```
 
@@ -209,7 +212,7 @@ pybabel compile -d translations
 Αν αλλάξουν τα `msgid`:
 
 ```bash
-pybabel extract -F babel.cfg -o messages.pot .
+pybabel extract -F babel.cfg -o messages.pot . --ignore-dirs=venv
 pybabel update -i messages.pot -d translations
 pybabel compile -d translations
 ```
@@ -223,7 +226,6 @@ pybabel compile -d translations
 ```
 [python: **.py]
 [jinja2: templates/**.html]
-extensions=jinja2.ext.autoescape,jinja2.ext.with_
 ```
 
 Αυτό επιτρέπει στο `pybabel` να αναλύει σωστά τόσο Python όσο και HTML αρχεία.

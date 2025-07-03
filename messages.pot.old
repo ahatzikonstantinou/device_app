@@ -1,18 +1,17 @@
-# Greek translations for PROJECT.
+# Translations template for PROJECT.
 # Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-03 03:24+0300\n"
+"POT-Creation-Date: 2025-07-03 03:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: el\n"
-"Language-Team: el <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +19,7 @@ msgstr ""
 
 #: templates/index.html:5 templates/index.html:23
 msgid "Device Manager"
-msgstr "Διαχείριση Συσκευών"
+msgstr ""
 
 #: templates/index.html:25
 msgid "MQTT Status: Unknown"
@@ -30,13 +29,14 @@ msgstr ""
 msgid "Αρχική"
 msgstr ""
 
-#: templates/index.html:31
+#: templates/index.html:31 templates/settings.html:5 templates/settings.html:27
+#: templates/settings.html:32
 msgid "Ρυθμίσεις"
 msgstr ""
 
 #: templates/index.html:36 templates/index.html:37
 msgid "Devices"
-msgstr "Προσθήκη Συσκευής"
+msgstr ""
 
 #: templates/index.html:40 templates/index.html:46 templates/index.html:368
 msgid "Προσθήκη Συσκευής"
@@ -198,11 +198,6 @@ msgstr ""
 msgid "Συμπλήρωσε όλα τα πεδία σωστά."
 msgstr ""
 
-#: templates/index.html:434
-#, python-format
-msgid "Το Pin %(conflict)s χρησιμοποιείται ήδη."
-msgstr ""
-
 #: templates/index.html:447
 msgid "Η συσκευή αποθηκεύθηκε!"
 msgstr ""
@@ -220,14 +215,13 @@ msgstr ""
 msgid "Προσθήκη νέας συσκευής"
 msgstr ""
 
-#: templates/settings.html:5 templates/settings.html:20
-#: templates/settings.html:27 templates/settings.html:32
+#: templates/settings.html:20
 msgid "Settings"
 msgstr "Ρυθμίσεις"
 
 #: templates/settings.html:36
 msgid "Select Language"
-msgstr "Επιλογή Γλώσσας"
+msgstr ""
 
 #: templates/settings.html:47
 msgid "IP Address"

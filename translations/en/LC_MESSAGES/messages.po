@@ -1,4 +1,4 @@
-# Greek translations for PROJECT.
+# English translations for PROJECT.
 # Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-07-03 03:24+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-07-03 03:06+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: el\n"
-"Language-Team: el <LL@li.org>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: templates/index.html:5 templates/index.html:23
 msgid "Device Manager"
-msgstr "Διαχείριση Συσκευών"
+msgstr ""
 
 #: templates/index.html:25
 msgid "MQTT Status: Unknown"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: templates/index.html:36 templates/index.html:37
 msgid "Devices"
-msgstr "Προσθήκη Συσκευής"
+msgstr ""
 
 #: templates/index.html:40 templates/index.html:46 templates/index.html:368
 msgid "Προσθήκη Συσκευής"
@@ -223,11 +223,11 @@ msgstr ""
 #: templates/settings.html:5 templates/settings.html:20
 #: templates/settings.html:27 templates/settings.html:32
 msgid "Settings"
-msgstr "Ρυθμίσεις"
+msgstr "Settings"
 
 #: templates/settings.html:36
 msgid "Select Language"
-msgstr "Επιλογή Γλώσσας"
+msgstr ""
 
 #: templates/settings.html:47
 msgid "IP Address"

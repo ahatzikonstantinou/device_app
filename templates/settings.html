@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="{{ get_locale() }}">
 <head>
   <meta charset="UTF-8" />
-  <title>Ρυθμίσεις MQTT</title>
+  <title>{{ _('Settings') }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />  
@@ -17,46 +17,54 @@
           <span></span>
           <span></span>
         </div>
-        <div class="page-title">Settings</div>
+        <div class="page-title">{{ _('Settings') }}</div>
       </div>
     </div>
 
     <div class="menu-overlay" id="menu-overlay"></div>
     <ul id="menu" class="menu">
-      <li><a href="/">Αρχική</a></li>
-      <li><a href="/settings" class="active">Ρυθμίσεις</a></li>
+      <li><a href="/">{{ _('Αρχική') }}</a></li>
+      <li><a href="/settings" class="active">{{ _('Settings') }}</a></li>
     </ul>
   </nav>
 
 <div class="container">
-  <h1>Ρυθμίσεις</h1>
+  <h1>{{ _('Settings') }}</h1>
+
   <form id="mqtt-form">
     <fieldset>
-      <legend>MQTT</legend>
+      <legend>{{ _('Select Language') }}</legend>
+      <select name="language" id="language">
+        <option value="en" {% if get_locale() == 'en' %}selected{% endif %}>English</option>
+        <option value="el" {% if get_locale() == 'el' %}selected{% endif %}>Ελληνικά</option>
+      </select>
+    </fieldset>
+    <fieldset>
+      <legend>{{ _('MQTT') }}</legend>
 
       <div class="form-group">
         <input type="text" id="ip" name="ip" placeholder=" " required />
-        <label for="ip">IP Address</label>
+        <label for="ip">{{ _('IP Address') }}</label>
       </div>
 
       <div class="form-group">
         <input type="number" id="port" name="port" placeholder=" " required min="1" max="65535" />
-        <label for="port">Port</label>
+        <label for="port">{{ _('Port') }}</label>
       </div>
 
       <div class="form-group">
         <input type="text" id="username" name="username" placeholder=" " />
-        <label for="username">Username</label>
+        <label for="username">{{ _('Username') }}</label>
       </div>
 
       <div class="form-group">
         <input type="password" id="password" name="password" placeholder=" " />
-        <label for="password">Password</label>
+        <label for="password">{{ _('Password') }}</label>
       </div>
 
       <div style="text-align: right;">
-        <button type="submit" class="text-btn">Αποθήκευση</button>
-        <button type="button" id="test-connection" class="text-btn">Δοκιμή Σύνδεσης</button>
+        <button type="submit" class="text-btn">{{ _('Αποθήκευση') }}</button>
+        <button type="button" id="test-connection" class="text-btn">{{ _('Δοκιμή Σύνδεσης') }}</button>
       </div>
     </fieldset>
   </form>
@@ -66,21 +74,27 @@
 <div id="toast-container"></div>
 
 <script>
-  // // Hamburger toggle
-  // const menuToggle = document.getElementById('menu-toggle');
-  // const menu = document.getElementById('menu');
-  // menuToggle.addEventListener('click', () => {
-  //   menu.classList.toggle('show');
-  // });
+  // Επιλογή γλώσσας
+  const languageSelect = document.getElementById('language');
 
-  // // Toast helper
-  // function showToast(msg, success=true) {
-  //   const toast = document.getElementById('toast');
-  //   toast.textContent = msg;
-  //   toast.style.backgroundColor = success ? 'var(--primary-dark)' : 'var(--error)';
-  //   toast.classList.add('show');
-  //   setTimeout(() => toast.classList.remove('show'), 3000);
-  // }
+  // On change, save lang to localStorage and reload page with ?lang=xx
+  languageSelect.addEventListener('change', () => {
+    const selectedLang = languageSelect.value;
+    localStorage.setItem('lang', selectedLang);
+
+    // Reload page with lang query param to tell backend about language
+    const url = new URL(window.location);
+    url.searchParams.set('lang', selectedLang);
+    window.location = url.toString();
+  });
+
+  // On load, if localStorage has lang, select it in dropdown
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang && savedLang !== languageSelect.value) {
+      languageSelect.value = savedLang;
+    }
+  });
 
   // Φόρτωσε τις υπάρχουσες ρυθμίσεις (προαιρετικό - αν backend έχει endpoint GET /api/mqtt)
   async function loadMqttConfig() {
@@ -94,7 +108,7 @@
         document.getElementById('password').value = data.password || '';
       }
     } catch (e) {
-      console.warn('Δεν φορτώθηκαν οι ρυθμίσεις MQTT');
+      console.warn('{{ _("Δεν φορτώθηκαν οι ρυθμίσεις MQTT") }}');
     }
   }
 
@@ -116,19 +130,19 @@
         body: JSON.stringify(config)
       });
       if (res.ok) {
-        showToast('Ρυθμίσεις αποθηκεύτηκαν!');
+        showToast('{{ _("Ρυθμίσεις αποθηκεύτηκαν!") }}');
       } else {
-        showToast('Αποτυχία αποθήκευσης', false);
+        showToast('{{ _("Αποτυχία αποθήκευσης") }}', false);
       }
     } catch (err) {
-      showToast('Σφάλμα δικτύου', false);
+      showToast('{{ _("Σφάλμα δικτύου") }}', false);
     }
   });
 
   document.getElementById('test-connection').addEventListener('click', async () => {
     const btn = document.getElementById('test-connection');
     btn.disabled = true;
-    btn.textContent = 'Δοκιμή...';
+    btn.textContent = '{{ _("Δοκιμή...") }}';
     
     const config = {
       ip: document.getElementById('ip').value.trim(),
@@ -146,18 +160,18 @@
       if (res.ok) {
         const result = await res.json();
         if (result.success) {
-          showToast('Η σύνδεση MQTT ήταν επιτυχής!');
+          showToast('{{ _("Η σύνδεση MQTT ήταν επιτυχής!") }}');
         } else {
-          showToast('Απέτυχε η σύνδεση MQTT: ' + (result.message || 'Άγνωστο σφάλμα'), false);
+          showToast('{{ _("Απέτυχε η σύνδεση MQTT") }}: ' + (result.message || '{{ _("Άγνωστο σφάλμα") }}'), false);
         }
       } else {
-        showToast('Απέτυχε η σύνδεση MQTT', false);
+        showToast('{{ _("Απέτυχε η σύνδεση MQTT") }}', false);
       }
     } catch {
-      showToast('Σφάλμα δικτύου κατά το test', false);
+      showToast('{{ _("Σφάλμα δικτύου κατά το test") }}', false);
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Δοκιμή Σύνδεσης';
+      btn.textContent = '{{ _("Δοκιμή Σύνδεσης") }}';
     }
   });
 
@@ -165,10 +179,10 @@
   function applyDarkMode(enabled) {
     if (enabled) {
       document.body.classList.add('dark-mode');
-      document.getElementById('dark-mode-toggle').textContent = 'Light Mode';
+      document.getElementById('dark-mode-toggle').textContent = '{{ _("Light Mode") }}';
     } else {
       document.body.classList.remove('dark-mode');
-      document.getElementById('dark-mode-toggle').textContent = 'Dark Mode';
+      document.getElementById('dark-mode-toggle').textContent = '{{ _("Dark Mode") }}';
     }
     localStorage.setItem('darkMode', enabled ? 'true' : 'false');
   }

@@ -2,9 +2,11 @@ import eventlet #this must come first before anything else
 eventlet.monkey_patch()
 
 from flask import Flask, render_template, request, jsonify, abort
-from flask_babel import Babel, _
+from flask_babel import Babel, gettext as _
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
+from flask import g
+from flask_babel import get_locale as babel_get_locale
 import uuid
 import json
 import os
@@ -15,9 +17,15 @@ from device_service import DeviceProvider
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
 CORS(app)
-babel = Babel()
+babel = Babel(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'el'
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = './translations'
+# Expose _ to Jinja
+app.jinja_env.globals.update(_=_)
+@app.context_processor
+def inject_get_locale():
+    # get_locale() returns a string
+    return dict(get_locale=lambda: str(babel_get_locale()))
 
 DEVICE_FILE = 'devices.json'
 CONFIG_FILE = 'config.json'
@@ -86,7 +94,12 @@ def save_devices(devices):
         json.dump(devices, f, indent=2)
 
 def get_locale():
-    return request.args.get('lang') or 'el'
+    # 1. Check URL query param
+    lang = request.args.get('lang')
+    if lang in ['en', 'el']:
+        return lang
+    # 2. Fallback to Accept-Language headers
+    return request.accept_languages.best_match(['en', 'el'])
 
 babel.init_app(app, locale_selector=get_locale)
 
