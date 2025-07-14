@@ -33,6 +33,7 @@ class GPIOSupervisor:
         GPIO.setup(pins['active']['pin'], GPIO.IN)
         GPIO.setup(pins['enabled']['pin'], GPIO.IN)
         GPIO.setup(pins['open']['pin'], GPIO.IN)
+        GPIO.setup(pins['overriden']['pin'], GPIO.IN)
         GPIO.setup(pins['enable']['pin'], GPIO.OUT)
         self.set_output_value(device['id'], 'enable', pins['enable']['value'])
         GPIO.setup(pins['override']['pin'], GPIO.OUT)
@@ -49,7 +50,7 @@ class GPIOSupervisor:
 
     def read_input_pins(self, device):
         # pins που είναι input
-        input_pins_keys = ['active', 'enabled', 'open']
+        input_pins_keys = ['active', 'enabled', 'open', 'overriden']
         pins = device['pins']
         new_pins = {}
 
@@ -104,7 +105,7 @@ class GPIOSupervisor:
             return {"success": False, "pin": pin_num, "error": str(e)}
         
     def monitor_loop(self):
-        input_pins_keys = ['active', 'enabled', 'open']
+        input_pins_keys = ['active', 'enabled', 'open', 'overriden']
 
         while True:
             for device_id, device in self.devices.items():
