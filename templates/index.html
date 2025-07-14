@@ -71,6 +71,11 @@
             <label for="pin_open">{{ _('Pin: Open') }}</label>
           </div>
 
+          <div class="form-group">
+            <input type="number" id="pin_overriden" name="pin_overriden" required placeholder=" " />
+            <label for="pin_overriden">{{ _('Pin: Overriden') }}</label>
+          </div>
+
           <div class="form-inline-pin">
             <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
             <label for="pin_enable">{{ _('Output Pin: Enable') }}</label>
@@ -268,6 +273,7 @@
                 <div class="item">{{ _('Active:') }} <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
                 <div class="item">{{ _('Enabled:') }} <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
                 <div class="item">{{ _('Open:') }} <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
+                <div class="item">{{ _('Overriden:') }} <span id="${device.id}-overriden">${p.overriden.pin} (${p.overriden.value})</span></div>
               </div>
 
               <div class="pin-group">
@@ -338,6 +344,7 @@
     form.pin_active.value = device.pins.active.pin;
     form.pin_enabled.value = device.pins.enabled.pin;
     form.pin_open.value = device.pins.open.pin;
+    form.pin_overriden.value = device.pins.overriden.pin;
     form.pin_enable.value = device.pins.enable.pin;
     form.pin_enable_value.value = device.pins.enable.value;
     form.pin_override.value = device.pins.override.pin;
@@ -378,6 +385,7 @@
       active: +form.get('pin_active'),
       enabled: +form.get('pin_enabled'),
       open: +form.get('pin_open'),
+      overriden: +form.get('pin_overriden'),
       enable: {
         pin: +form.get('pin_enable'),
         value: +form.get('pin_enable_value') 
@@ -400,6 +408,7 @@
       isNaN(pins.active) ||
       isNaN(pins.enabled) ||
       isNaN(pins.open) ||
+      isNaN(pins.overriden) ||
       isNaN(pins.enable.pin) ||
       isNaN(pins.enable.value) ||
       isNaN(pins.override.pin) ||
