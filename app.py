@@ -235,7 +235,8 @@ def get_device_status(device_id):
     return jsonify({
         'active': pins_status['active']['value'],
         'enabled': pins_status['enabled']['value'],
-        'open': pins_status['open']['value']
+        'open': pins_status['open']['value'],
+        'overriden': pins_status['overriden']['value']
     })
 
 @app.route('/settings')
