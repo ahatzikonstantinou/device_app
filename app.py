@@ -127,8 +127,9 @@ def on_pin_change_update_device(device_id, pin_key, new_value):
         save_devices(device_list)
         print(f"Updated device {device_id} pin {pin_key} to {new_value} and saved devices.json")
         
-        mqtt_client.publish(device['mqtt']['status'], json.dumps(device['pins'], indent=2))
-        print(f"Published status update {device['mqtt']['status']}: {json.dumps(device['pins'], indent=2)}")
+        # mqtt_client.publish(device['mqtt']['status'], json.dumps(device['pins'], indent=2))
+        # print(f"Published status update {device['mqtt']['status']}: {json.dumps(device['pins'], indent=2)}")
+        mqtt_client.publish_status(device)
     else:
         print(f"Pin key {pin_key} not found in device {device_id}")
 
@@ -227,17 +228,8 @@ def get_device_status(device_id):
     if not device:
         return jsonify({'error': 'Device not found'}), 404
 
-    # This will re-read input pins and return the device dict
-    updated_device = supervisor.read_input_pins(device)
-    pins_status = updated_device['pins']
-
-    # Only return the input pins' values
-    return jsonify({
-        'active': pins_status['active']['value'],
-        'enabled': pins_status['enabled']['value'],
-        'open': pins_status['open']['value'],
-        'overriden': pins_status['overriden']['value']
-    })
+    #print(json.dumps(device_provider.get_status(device), indent=2))
+    return json.dumps(device_provider.get_status(device), indent=2)
 
 @app.route('/settings')
 def settings():

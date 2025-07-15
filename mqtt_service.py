@@ -25,7 +25,7 @@ class MQTTService:
     def _on_message_wrapper(self, client, userdata, msg):
         topic = msg.topic
         payload = msg.payload.decode()
-        print(f"Received MQTT message on {topic}: {payload}")
+        print(f"Received MQTT message on '{topic}': '{payload}'")
 
         if topic.endswith("/enable"):
             command = "enable"
@@ -53,13 +53,17 @@ class MQTTService:
                     print(f"Ignoring invalid payload for {topic}, {command}: {payload}")
         elif command == "report_status":
             # Respond by publishing current status
-            status = json.dumps(self.device_provider.get_status(device), indent=2)
-            publish_status_topic = self.device_provider.get_publish_status_topic(device)
+            self.publish_status(device)
 
-            try:
-                self.publish(publish_status_topic, status)
-            except Exception as e:
-                print(f"Error handling report_status for {publish_status_topic}: {e}")
+    def publish_status(self, device):
+        status = json.dumps(self.device_provider.get_status(device), indent=2)
+        publish_status_topic = self.device_provider.get_publish_status_topic(device)
+
+        try:
+            print(f"Publishing status {status}")
+            self.publish(publish_status_topic, status)
+        except Exception as e:
+            print(f"Error handling report_status for {publish_status_topic}: {e}")
 
     def _on_connect(self, client, userdata, flags, rc):
         if rc == 0:
