@@ -31,7 +31,7 @@ class DeviceProvider:
         pins = device.get('pins', {})
         return {
             key: pins[key]['value']
-            for key in ['active', 'enabled', 'open', 'overriden', 'enable', 'override']
+            for key in ['powered', 'active', 'enabled', 'open', 'overriden', 'enable', 'override']
             if key in pins and 'value' in pins[key]
         }
 

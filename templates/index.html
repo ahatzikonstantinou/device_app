@@ -57,6 +57,11 @@
           <legend>GPIO Pins</legend>
 
           <div class="form-group">
+            <input type="number" id="pin_powered" name="pin_powered" required placeholder=" " />
+            <label for="pin_powered">{{ _('Pin: Powered') }}</label>
+          </div>
+
+          <div class="form-group">
             <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
             <label for="pin_active">{{ _('Pin: Active') }}</label>
           </div>
@@ -270,6 +275,7 @@
             <div class="group">
               <div class="pin-group">
                 <h5>{{ _('Status Pins') }}</h5>
+                <div class="item">{{ _('Powered:') }} <span id="${device.id}-powered">${p.powered.pin} (${p.powered.value})</span></div>
                 <div class="item">{{ _('Active:') }} <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
                 <div class="item">{{ _('Enabled:') }} <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
                 <div class="item">{{ _('Open:') }} <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
@@ -341,6 +347,7 @@
     setEditIndicator(device.name);
     const form = document.getElementById('add-device-form');
     form.name.value = device.name;
+    form.pin_powered.value = device.pins.powered.pin;
     form.pin_active.value = device.pins.active.pin;
     form.pin_enabled.value = device.pins.enabled.pin;
     form.pin_open.value = device.pins.open.pin;
@@ -382,6 +389,7 @@
     const name = form.get('name');
 
     const pins = {
+      powered: +form.get('pin_powered'),
       active: +form.get('pin_active'),
       enabled: +form.get('pin_enabled'),
       open: +form.get('pin_open'),
@@ -405,6 +413,7 @@
 
     if (
       !name ||
+      isNaN(pins.powered) ||
       isNaN(pins.active) ||
       isNaN(pins.enabled) ||
       isNaN(pins.open) ||
