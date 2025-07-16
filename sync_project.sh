@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Replace these variables with your actual values
-PI_USERNAME="antonis"
-PI_HOST="192.168.3.23"
+DEFAULT_PI_USERNAME="antonis"
+DEFAULT_PI_HOST="192.168.3.21"
 PI_DESTINATION="/opt/device_app/"
 
 # Function to display usage information
 usage() {
-    echo "Usage: $0 <project_folder>"
-    echo "Example: $0 /path/to/project"
+    echo "Usage: $0 <project_folder> [username] [host]"
+    echo "Example: $0 /path/to/project antonis 192.168.3.21"
     exit 1
 }
 
@@ -32,6 +32,8 @@ fi
 
 # Define the project folder
 PROJECT_FOLDER="$1"
+PI_USERNAME="${2:-$DEFAULT_PI_USERNAME}"
+PI_HOST="${3:-$DEFAULT_PI_HOST}"
 
 # Define the list of files and folders to be copied
 SOURCE_FOLDERS=(
