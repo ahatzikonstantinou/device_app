@@ -549,3 +549,10 @@ button[type="button"]:hover {
   text-decoration: underline;
   background: none;
 }
+
+.note {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 0.5rem;
+  display: block;
+}

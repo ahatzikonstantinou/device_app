@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-03 03:24+0300\n"
+"POT-Creation-Date: 2025-07-17 00:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,7 +37,7 @@ msgstr ""
 msgid "Devices"
 msgstr ""
 
-#: templates/index.html:40 templates/index.html:46 templates/index.html:368
+#: templates/index.html:40 templates/index.html:46 templates/index.html:384
 msgid "Προσθήκη Συσκευής"
 msgstr ""
 
@@ -53,169 +53,199 @@ msgstr ""
 msgid "Όνομα Συσκευής"
 msgstr ""
 
-#: templates/index.html:61
+#: templates/index.html:58
+msgid ""
+"BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low "
+"i.e. a 1 means no signal in input, open relay at output. 0 means signal "
+"detected in input, close relay at output."
+msgstr ""
+
+#: templates/index.html:62
+msgid "Pin: Powered"
+msgstr ""
+
+#: templates/index.html:67
 msgid "Pin: Active"
 msgstr ""
 
-#: templates/index.html:66
+#: templates/index.html:72
 msgid "Pin: Enabled"
 msgstr ""
 
-#: templates/index.html:71
-msgid "Pin: Open"
+#: templates/index.html:77
+msgid "Pin: Closed"
 msgstr ""
 
-#: templates/index.html:76
+#: templates/index.html:82
+msgid "Pin: Overriden"
+msgstr ""
+
+#: templates/index.html:87
 msgid "Output Pin: Enable"
 msgstr ""
 
-#: templates/index.html:85
+#: templates/index.html:96
 msgid "Output Pin: Override"
 msgstr ""
 
-#: templates/index.html:94 templates/index.html:288 templates/settings.html:43
+#: templates/index.html:105 templates/index.html:302 templates/settings.html:43
 msgid "MQTT"
 msgstr ""
 
-#: templates/index.html:98 templates/index.html:291
+#: templates/index.html:109 templates/index.html:305
 msgid "Publish Status Topic"
 msgstr ""
 
-#: templates/index.html:103
+#: templates/index.html:114
 msgid "Subscribe Enable Topic"
 msgstr ""
 
-#: templates/index.html:108
+#: templates/index.html:119
 msgid "Subscribe Override Topic"
 msgstr ""
 
-#: templates/index.html:113
+#: templates/index.html:124
 msgid "Report Status Topic"
 msgstr ""
 
-#: templates/index.html:118 templates/index.html:363 templates/settings.html:66
+#: templates/index.html:129 templates/index.html:379 templates/settings.html:66
 msgid "Αποθήκευση"
 msgstr ""
 
-#: templates/index.html:119 templates/index.html:139 templates/index.html:153
+#: templates/index.html:130 templates/index.html:150 templates/index.html:164
 msgid "Κλείσιμο"
 msgstr ""
 
-#: templates/index.html:129
+#: templates/index.html:140
 msgid "Set Pin Value"
 msgstr ""
 
-#: templates/index.html:130
+#: templates/index.html:141
 msgid "GPIO ID:"
 msgstr ""
 
-#: templates/index.html:138
+#: templates/index.html:149
 msgid "Set"
 msgstr ""
 
-#: templates/index.html:147
+#: templates/index.html:158
 msgid "Αποστολή MQTT Μηνύματος"
 msgstr ""
 
-#: templates/index.html:152
+#: templates/index.html:163
 msgid "Αποστολή"
 msgstr ""
 
-#: templates/index.html:264
+#: templates/index.html:275
 msgid "GPIO Pins"
 msgstr ""
 
-#: templates/index.html:267
+#: templates/index.html:276
+msgid ""
+"BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low "
+"i.e. a 1 means no signal in input, open relay at output. 0 means signal "
+"detected in input, close relay at output"
+msgstr ""
+
+#: templates/index.html:279
 msgid "Status Pins"
 msgstr ""
 
-#: templates/index.html:268
+#: templates/index.html:280
+msgid "Powered:"
+msgstr ""
+
+#: templates/index.html:281
 msgid "Active:"
 msgstr ""
 
-#: templates/index.html:269
+#: templates/index.html:282
 msgid "Enabled:"
 msgstr ""
 
-#: templates/index.html:270
-msgid "Open:"
+#: templates/index.html:283
+msgid "Closed:"
 msgstr ""
 
-#: templates/index.html:274
+#: templates/index.html:284
+msgid "Overriden:"
+msgstr ""
+
+#: templates/index.html:288
 msgid "Control Pins"
 msgstr ""
 
-#: templates/index.html:276 templates/index.html:296
+#: templates/index.html:290 templates/index.html:310
 msgid "Enable:"
 msgstr ""
 
-#: templates/index.html:280 templates/index.html:297
+#: templates/index.html:294 templates/index.html:311
 msgid "Override:"
 msgstr ""
 
-#: templates/index.html:292
+#: templates/index.html:306
 msgid "Status:"
 msgstr ""
 
-#: templates/index.html:295
+#: templates/index.html:309
 msgid "Subscribe Control Topics"
 msgstr ""
 
-#: templates/index.html:298
+#: templates/index.html:312
 msgid "Report status:"
 msgstr ""
 
-#: templates/index.html:304
+#: templates/index.html:318
 msgid "Επεξεργασία"
 msgstr ""
 
-#: templates/index.html:305
+#: templates/index.html:319
 msgid "Διαγραφή"
 msgstr ""
 
-#: templates/index.html:316
+#: templates/index.html:330
 msgid "Να διαγραφεί η συσκευή;"
 msgstr ""
 
-#: templates/index.html:319
+#: templates/index.html:333
 msgid "Διαγράφηκε"
 msgstr ""
 
-#: templates/index.html:324
+#: templates/index.html:338
 msgid "Σφάλμα διαγραφής."
 msgstr ""
 
-#: templates/index.html:332
+#: templates/index.html:346
 msgid "Επεξεργασία Συσκευής"
 msgstr ""
 
-#: templates/index.html:355
+#: templates/index.html:371
 msgid "Ενημέρωση"
 msgstr ""
 
-#: templates/index.html:408
+#: templates/index.html:428
 msgid "Συμπλήρωσε όλα τα πεδία σωστά."
 msgstr ""
 
-#: templates/index.html:434
+#: templates/index.html:454
 #, python-format
-msgid "Το Pin %(conflict)s χρησιμοποιείται ήδη."
+msgid "Το Pin %%\\(conflict\\)s χρησιμοποιείται ήδη."
 msgstr ""
 
-#: templates/index.html:447
+#: templates/index.html:469
 msgid "Η συσκευή αποθηκεύθηκε!"
 msgstr ""
 
-#: templates/index.html:447
+#: templates/index.html:469
 msgid "Η συσκευή προστέθηκε!"
 msgstr ""
 
-#: templates/index.html:487
+#: templates/index.html:509
 #, python-format
-msgid "Επεξεργάζεσαι τη συσκευή \"%(deviceName)s\""
+msgid "Επεξεργάζεσαι τη συσκευή \"%%\\(deviceName\\)s\""
 msgstr ""
 
-#: templates/index.html:537
+#: templates/index.html:560
 msgid "Προσθήκη νέας συσκευής"
 msgstr ""
 

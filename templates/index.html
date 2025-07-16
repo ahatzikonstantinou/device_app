@@ -55,6 +55,7 @@
 
         <fieldset>
           <legend>GPIO Pins</legend>
+          <div class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output.') }}</div>
 
           <div class="form-group">
             <input type="number" id="pin_powered" name="pin_powered" required placeholder=" " />
@@ -72,8 +73,8 @@
           </div>
 
           <div class="form-group">
-            <input type="number" id="pin_open" name="pin_open" required placeholder=" " />
-            <label for="pin_open">{{ _('Pin: Open') }}</label>
+            <input type="number" id="pin_closed" name="pin_closed" required placeholder=" " />
+            <label for="pin_closed">{{ _('Pin: Closed') }}</label>
           </div>
 
           <div class="form-group">
@@ -220,7 +221,7 @@
     //     pin: 2,
     //     value: 0
     //   },
-    //   open:  
+    //   closed:  
     //   {
     //     pin: 3,
     //     value: 1
@@ -272,13 +273,14 @@
         <div class="device-details">
           <div class="device-section">
             <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
+            <p class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output') }}</p>
             <div class="group">
               <div class="pin-group">
                 <h5>{{ _('Status Pins') }}</h5>
                 <div class="item">{{ _('Powered:') }} <span id="${device.id}-powered">${p.powered.pin} (${p.powered.value})</span></div>
                 <div class="item">{{ _('Active:') }} <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
                 <div class="item">{{ _('Enabled:') }} <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
-                <div class="item">{{ _('Open:') }} <span id="${device.id}-open">${p.open.pin} (${p.open.value})</span></div>
+                <div class="item">{{ _('Closed:') }} <span id="${device.id}-closed">${p.closed.pin} (${p.closed.value})</span></div>
                 <div class="item">{{ _('Overriden:') }} <span id="${device.id}-overriden">${p.overriden.pin} (${p.overriden.value})</span></div>
               </div>
 
@@ -350,7 +352,7 @@
     form.pin_powered.value = device.pins.powered.pin;
     form.pin_active.value = device.pins.active.pin;
     form.pin_enabled.value = device.pins.enabled.pin;
-    form.pin_open.value = device.pins.open.pin;
+    form.pin_closed.value = device.pins.closed.pin;
     form.pin_overriden.value = device.pins.overriden.pin;
     form.pin_enable.value = device.pins.enable.pin;
     form.pin_enable_value.value = device.pins.enable.value;
@@ -392,7 +394,7 @@
       powered: +form.get('pin_powered'),
       active: +form.get('pin_active'),
       enabled: +form.get('pin_enabled'),
-      open: +form.get('pin_open'),
+      open: +form.get('pin_closed'),
       overriden: +form.get('pin_overriden'),
       enable: {
         pin: +form.get('pin_enable'),
@@ -416,7 +418,7 @@
       isNaN(pins.powered) ||
       isNaN(pins.active) ||
       isNaN(pins.enabled) ||
-      isNaN(pins.open) ||
+      isNaN(pins.closed) ||
       isNaN(pins.overriden) ||
       isNaN(pins.enable.pin) ||
       isNaN(pins.enable.value) ||

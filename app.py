@@ -123,12 +123,8 @@ def on_pin_change_update_device(device_id, pin_key, new_value):
         return
     if pin_key in device['pins']:
         device['pins'][pin_key]['value'] = new_value
-
         save_devices(device_list)
-        print(f"Updated device {device_id} pin {pin_key} to {new_value} and saved devices.json")
-        
-        # mqtt_client.publish(device['mqtt']['status'], json.dumps(device['pins'], indent=2))
-        # print(f"Published status update {device['mqtt']['status']}: {json.dumps(device['pins'], indent=2)}")
+        print(f"Updated device {device_id} pin {pin_key} to {new_value} and saved devices.json")        
         mqtt_client.publish_status(device)
     else:
         print(f"Pin key {pin_key} not found in device {device_id}")
