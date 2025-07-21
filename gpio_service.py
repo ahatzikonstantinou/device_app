@@ -7,6 +7,7 @@ GPIO.setmode(GPIO.BCM)
 
 # Define input pin keys globally so they are consistent and easy to update
 INPUT_PIN_KEYS = ['powered', 'active', 'enabled', 'closed', 'overriden']
+OUTPUT_PIN_KEYS = ['enable', 'override']
 
 class GPIOSupervisor:
     def __init__(self, on_pin_change=None):
@@ -33,15 +34,25 @@ class GPIOSupervisor:
     def add_device(self, device):
         self.devices[device['id']] = device
         pins = device['pins']
-        GPIO.setup(pins['powered']['pin'], GPIO.IN)
-        GPIO.setup(pins['active']['pin'], GPIO.IN)
-        GPIO.setup(pins['enabled']['pin'], GPIO.IN)
-        GPIO.setup(pins['closed']['pin'], GPIO.IN)
-        GPIO.setup(pins['overriden']['pin'], GPIO.IN)
-        GPIO.setup(pins['enable']['pin'], GPIO.OUT)
-        self.set_output_value(device['id'], 'enable', pins['enable']['value'])
-        GPIO.setup(pins['override']['pin'], GPIO.OUT)
-        self.set_output_value(device['id'], 'override', pins['override']['value'])
+        for key in INPUT_PIN_KEYS:
+            if key in pins:
+                GPIO.setup(pins[key]['pin'], GPIO.IN)
+
+        # GPIO.setup(pins['powered']['pin'], GPIO.IN)
+        # GPIO.setup(pins['active']['pin'], GPIO.IN)
+        # GPIO.setup(pins['enabled']['pin'], GPIO.IN)
+        # GPIO.setup(pins['closed']['pin'], GPIO.IN)
+        # GPIO.setup(pins['overriden']['pin'], GPIO.IN)
+
+        for key in OUTPUT_PIN_KEYS:
+            if key in pins:
+                GPIO.setup(pins[key]['pin'], GPIO.OUT)
+                self.set_output_value(device['id'], key, pins[key]['value'])
+
+        # GPIO.setup(pins['enable']['pin'], GPIO.OUT)
+        # self.set_output_value(device['id'], 'enable', pins['enable']['value'])
+        # GPIO.setup(pins['override']['pin'], GPIO.OUT)
+        # self.set_output_value(device['id'], 'override', pins['override']['value'])
 
 
     def update_device(self, device):
@@ -109,7 +120,7 @@ class GPIOSupervisor:
             return {"success": False, "pin": pin_num, "error": str(e)}
         
     def monitor_loop(self):
-        input_pins_keys = ['powered', 'active', 'enabled', 'closed', 'overriden']
+        input_pins_keys = INPUT_PIN_KEYS
 
         while True:
             for device_id, device in self.devices.items():

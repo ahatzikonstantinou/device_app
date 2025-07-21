@@ -48,6 +48,7 @@
       <button type="button" id="backBtn" class="text-btn" style="margin-bottom: 1rem; display:none;"><span class="material-symbols-outlined">arrow_back</span>{{ _('Επιστροφή') }}</button>
 
       <form id="add-device-form">
+        <input type="hidden" id="deviceId" name="id"/>
         <div class="form-group">
           <input type="text" id="deviceName" name="name" required placeholder=" " />
           <label for="deviceName">{{ _('Όνομα Συσκευής') }}</label>
@@ -258,71 +259,83 @@
     container.innerHTML = '';
 
     data.forEach(device => {
-      const p = device.pins;
-      const mqtt = device.mqtt || {};
+  const p = device.pins || {};
+  const mqtt = device.mqtt || {};
 
-      const card = document.createElement('div');
-      card.className = 'device-card';
+  const card = document.createElement('div');
+  card.className = 'device-card';
 
-      card.innerHTML = `
-        <div class="device-header" onclick="toggleCard(this)">
-          <h3 class="device-title">${device.name}</h3>
-          <span class="toggle-icon">▾</span>
-        </div>
+  // Helper to safely render input pins
+  const renderInputPin = (key, label) => {
+    return p[key] ? `<div class="item">{{ _('${label}') }}<span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span></div>` : '';
+  };
 
-        <div class="device-details">
-          <div class="device-section">
-            <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
-            <p class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output') }}</p>
-            <div class="group">
-              <div class="pin-group">
-                <h5>{{ _('Status Pins') }}</h5>
-                <div class="item">{{ _('Powered:') }} <span id="${device.id}-powered">${p.powered.pin} (${p.powered.value})</span></div>
-                <div class="item">{{ _('Active:') }} <span id="${device.id}-active">${p.active.pin} (${p.active.value})</span></div>
-                <div class="item">{{ _('Enabled:') }} <span id="${device.id}-enabled">${p.enabled.pin} (${p.enabled.value})</span></div>
-                <div class="item">{{ _('Closed:') }} <span id="${device.id}-closed">${p.closed.pin} (${p.closed.value})</span></div>
-                <div class="item">{{ _('Overriden:') }} <span id="${device.id}-overriden">${p.overriden.pin} (${p.overriden.value})</span></div>
-              </div>
+  // Helper to safely render control (output) pins
+  const renderControlPin = (key, label) => {
+    return p[key] ? `
+      <div class="item">
+        <button class="text-btn" onclick="openPinModal(${p[key].pin}, ${p[key].value}, '${label}')">{{ _('${label}') }}</button>
+        <span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span>
+      </div>
+    ` : '';
+  };
 
-              <div class="pin-group">
-                <h5>{{ _('Control Pins') }}</h5>
-                <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.enable.pin}, ${p.enable.value}, 'Enable')">{{ _('Enable:') }}</button>
-                  <span id="${device.id}-enable">${p.enable.pin} (${p.enable.value})</span>
-                </div>
-                <div class="item">
-                  <button class="text-btn" onclick="openPinModal(${p.override.pin}, ${p.override.value}, 'Override')">{{ _('Override:') }}</button>
-                  <span id="${device.id}-override">${p.override.pin} (${p.override.value})</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <hr>
-          <div class="device-section">
-            <h4 class="section-title">{{ _('MQTT') }}</h4>
-            <div class="group mqtt">
-              <div class="mqtt-group">
-                <h5>{{ _('Publish Status Topic') }}</h5>
-                <div class="item">{{ _('Status:') }} <span class="mqtt-topic" data-topic-type="status">${mqtt.status || '-'}</span></div>
-              </div>
-              <div class="mqtt-group">
-                <h5>{{ _('Subscribe Control Topics') }}</h5>
-                <div class="item">{{ _('Enable:') }} <span class="mqtt-topic" data-topic-type="enable">${mqtt.enable || '-'}</span></div>
-                <div class="item">{{ _('Override:') }} <span class="mqtt-topic" data-topic-type="override">${mqtt.override || '-'}</span></div>
-                <div class="item">{{ _('Report status:') }} <span class="mqtt-topic" data-topic-type="report_status">${mqtt.report_status || '-'}</span></div>
-              </div>
-            </div>
+  card.innerHTML = `
+    <div class="device-header" onclick="toggleCard(this)">
+      <h3 class="device-title">${device.name}</h3>
+      <span class="toggle-icon">▾</span>
+    </div>
+
+    <div class="device-details">
+      <div class="device-section">
+        <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
+        <p class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output') }}</p>
+        <div class="group">
+          <div class="pin-group">
+            <h5>{{ _('Status Pins') }}</h5>
+            ${renderInputPin('powered', 'Powered:')}
+            ${renderInputPin('active', 'Active:')}
+            ${renderInputPin('enabled', 'Enabled:')}
+            ${renderInputPin('closed', 'Closed:')}
+            ${renderInputPin('overriden', 'Overriden:')}
           </div>
 
-          <div class="device-buttons">
-            <button class="text-btn" onclick="editDevice('${device.id}')">{{ _('Επεξεργασία') }}</button>
-            <button class="text-btn danger" onclick="deleteDevice('${device.id}')">{{ _('Διαγραφή') }}</button>
+          <div class="pin-group">
+            <h5>{{ _('Control Pins') }}</h5>
+            ${renderControlPin('enable', 'Enable:')}
+            ${renderControlPin('override', 'Override:')}
           </div>
         </div>
-      `;
+      </div>
 
-      container.appendChild(card);
-    });
+      <hr>
+
+      <div class="device-section">
+        <h4 class="section-title">{{ _('MQTT') }}</h4>
+        <div class="group mqtt">
+          <div class="mqtt-group">
+            <h5>{{ _('Publish Status Topic') }}</h5>
+            <div class="item">{{ _('Status:') }} <span class="mqtt-topic" data-topic-type="status">${mqtt.status || '-'}</span></div>
+          </div>
+          <div class="mqtt-group">
+            <h5>{{ _('Subscribe Control Topics') }}</h5>
+            <div class="item">{{ _('Enable:') }} <span class="mqtt-topic" data-topic-type="enable">${mqtt.enable || '-'}</span></div>
+            <div class="item">{{ _('Override:') }} <span class="mqtt-topic" data-topic-type="override">${mqtt.override || '-'}</span></div>
+            <div class="item">{{ _('Report status:') }} <span class="mqtt-topic" data-topic-type="report_status">${mqtt.report_status || '-'}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="device-buttons">
+        <button class="text-btn" onclick="editDevice('${device.id}')">{{ _('Επεξεργασία') }}</button>
+        <button class="text-btn danger" onclick="deleteDevice('${device.id}')">{{ _('Διαγραφή') }}</button>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(card);
+});
+
 
   }
 
@@ -344,33 +357,52 @@
   function editDevice(id) {
     enterEditMode();
     document.getElementById('form-title').textContent = '{{ _("Επεξεργασία Συσκευής") }}';
+    
     const device = allDevices.find(d => d.id === id);
-    
-    setEditIndicator(device.name);
-    const form = document.getElementById('add-device-form');
-    form.name.value = device.name;
-    form.pin_powered.value = device.pins.powered.pin;
-    form.pin_active.value = device.pins.active.pin;
-    form.pin_enabled.value = device.pins.enabled.pin;
-    form.pin_closed.value = device.pins.closed.pin;
-    form.pin_overriden.value = device.pins.overriden.pin;
-    form.pin_enable.value = device.pins.enable.pin;
-    form.pin_enable_value.value = device.pins.enable.value;
-    form.pin_override.value = device.pins.override.pin;
-    form.pin_override_value.value = device.pins.override.value;
-    
-    form.mqtt_pub_status_topic.value = device.mqtt.status;
-    form.mqtt_sub_enable_topic.value = device.mqtt.enable;
-    form.mqtt_sub_override_topic.value = device.mqtt.override;
-    form.mqtt_sub_report_status_topic.value = device.mqtt.report_status;
+    if (!device) return;
 
-    form.querySelector(`input[name="pin_enable_value"][value="${device.pins.enable.value}"]`).checked = true;
-    form.querySelector(`input[name="pin_override_value"][value="${device.pins.override.value}"]`).checked = true;
+    setEditIndicator(device.name);
+
+    const form = document.getElementById('add-device-form');
+    const p = device.pins || {};
+    const m = device.mqtt || {};
+
+    form.id.value = device.id;
+    form.name.value = device.name || '';
+
+    form.pin_powered.value = p.powered?.pin ?? '';
+    form.pin_active.value = p.active?.pin ?? '';
+    form.pin_enabled.value = p.enabled?.pin ?? '';
+    form.pin_closed.value = p.closed?.pin ?? '';
+    form.pin_overriden.value = p.overriden?.pin ?? '';
+
+    form.pin_enable.value = p.enable?.pin ?? '';
+    form.pin_enable_value.value = p.enable?.value ?? 0;
+
+    form.pin_override.value = p.override?.pin ?? '';
+    form.pin_override_value.value = p.override?.value ?? 0;
+
+    form.mqtt_pub_status_topic.value = m.status ?? '';
+    form.mqtt_sub_enable_topic.value = m.enable ?? '';
+    form.mqtt_sub_override_topic.value = m.override ?? '';
+    form.mqtt_sub_report_status_topic.value = m.report_status ?? '';
+
+    // Only check radio buttons if the value exists and matches an available radio
+    if (p.enable?.value !== undefined) {
+      const radio = form.querySelector(`input[name="pin_enable_value"][value="${p.enable.value}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    if (p.override?.value !== undefined) {
+      const radio = form.querySelector(`input[name="pin_override_value"][value="${p.override.value}"]`);
+      if (radio) radio.checked = true;
+    }
 
     editingDeviceId = id;
     form.querySelector('button[type="submit"]').textContent = '{{ _("Ενημέρωση") }}';
     document.body.classList.add('show-detail');
   }
+
 
   function addNewDevice() {
     enterEditMode();
@@ -389,6 +421,7 @@
     e.preventDefault();
     const form = new FormData(this);
     const name = form.get('name');
+    const id = form.get('id');
 
     function parsePin(value) {
       if (value === null || value === '') {
@@ -444,6 +477,7 @@
 
 
     const device = {
+      id,
       name,
       pins,
       mqtt
@@ -461,7 +495,7 @@
     } else {
       const used = getUsedPins();
       const conflict = Object.entries(pins).find(([k, v]) => {
-        const pinNum = typeof v === 'object' ? v.pin : v;
+        const pinNum = typeof v === 'object' && v != null ? v.pin : v;
         return used.has(pinNum);
       });
       if (conflict) {

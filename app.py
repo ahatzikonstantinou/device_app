@@ -206,7 +206,7 @@ def update_device(device_id):
             abort(400, "Pins must be unique across all devices.")
 
         new_device = {
-            "id": str(uuid.uuid4()),
+            "id": device_id,
             "name": name,
             "pins": pins,
             "mqtt": mqtt
