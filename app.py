@@ -71,13 +71,21 @@ def normalize_pins(pins_in):
         else:
             pin_num = val
             value_num = 0
-        if not isinstance(pin_num, int) or not isinstance(value_num, int):
-            abort(400, f"Invalid pin or value for {key}")
+
+        # Skip if pin number is not defined or not an int
+        if pin_num is None or not isinstance(pin_num, int):
+            continue
+
+        if not isinstance(value_num, int):
+            abort(400, f"Invalid value for {key}")
+
         pins[key] = {
             "pin": pin_num,
             "value": value_num
         }
+
     return pins
+
 
 def load_devices():
     if not os.path.exists(DEVICE_FILE):
@@ -162,7 +170,7 @@ def devices():
             "pins": pins,
             "mqtt": mqtt
         }
-        device_list .append(new_device)
+        device_list.append(new_device)
         save_devices(device_list )
         supervisor.add_device(new_device)
 

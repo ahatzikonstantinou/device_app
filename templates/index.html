@@ -58,32 +58,32 @@
           <div class="form-group note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output.') }}</div>
 
           <div class="form-group">
-            <input type="number" id="pin_powered" name="pin_powered" required placeholder=" " />
+            <input type="number" id="pin_powered" name="pin_powered" placeholder=" " />
             <label for="pin_powered">{{ _('Pin: Powered') }}</label>
           </div>
 
           <div class="form-group">
-            <input type="number" id="pin_active" name="pin_active" required placeholder=" " />
+            <input type="number" id="pin_active" name="pin_active" placeholder=" " />
             <label for="pin_active">{{ _('Pin: Active') }}</label>
           </div>
 
           <div class="form-group">
-            <input type="number" id="pin_enabled" name="pin_enabled" required placeholder=" " />
+            <input type="number" id="pin_enabled" name="pin_enabled" placeholder=" " />
             <label for="pin_enabled">{{ _('Pin: Enabled') }}</label>
           </div>
 
           <div class="form-group">
-            <input type="number" id="pin_closed" name="pin_closed" required placeholder=" " />
+            <input type="number" id="pin_closed" name="pin_closed" placeholder=" " />
             <label for="pin_closed">{{ _('Pin: Closed') }}</label>
           </div>
 
           <div class="form-group">
-            <input type="number" id="pin_overriden" name="pin_overriden" required placeholder=" " />
+            <input type="number" id="pin_overriden" name="pin_overriden" placeholder=" " />
             <label for="pin_overriden">{{ _('Pin: Overriden') }}</label>
           </div>
 
           <div class="form-inline-pin">
-            <input type="number" id="pin_enable" name="pin_enable" required placeholder=" " />
+            <input type="number" id="pin_enable" name="pin_enable" placeholder=" " />
             <label for="pin_enable">{{ _('Output Pin: Enable') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_enable_value" value="0" /> 0</label>
@@ -92,7 +92,7 @@
           </div>
 
           <div class="form-inline-pin">
-            <input type="number" id="pin_override" name="pin_override" required placeholder=" " />
+            <input type="number" id="pin_override" name="pin_override" placeholder=" " />
             <label for="pin_override">{{ _('Output Pin: Override') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_override_value" value="0" /> 0</label>
@@ -390,19 +390,27 @@
     const form = new FormData(this);
     const name = form.get('name');
 
+    function parsePin(value) {
+      if (value === null || value === '') {
+        return null; // or undefined, if you prefer
+      }
+      // Check if value is numeric
+      return isNaN(value) ? NaN : Number(value);
+    }
+
     const pins = {
-      powered: +form.get('pin_powered'),
-      active: +form.get('pin_active'),
-      enabled: +form.get('pin_enabled'),
-      closed: +form.get('pin_closed'),
-      overriden: +form.get('pin_overriden'),
+      powered: parsePin(form.get('pin_powered')),
+      active: parsePin(form.get('pin_active')),
+      enabled: parsePin(form.get('pin_enabled')),
+      closed: parsePin(form.get('pin_closed')),
+      overriden: parsePin(form.get('pin_overriden')),
       enable: {
-        pin: +form.get('pin_enable'),
-        value: +form.get('pin_enable_value') 
+        pin: parsePin(form.get('pin_enable')),
+        value: parsePin(form.get('pin_enable_value'))
       },
       override: {
-        pin: +form.get('pin_override'),
-        value: +form.get('pin_override_value') 
+        pin: parsePin(form.get('pin_override')),
+        value: parsePin(form.get('pin_override_value'))
       }
     };
 
@@ -413,21 +421,27 @@
       report_status: form.get('mqtt_sub_report_status_topic')
     };
 
+    // Validation: name must be present, and all pins must be either null (empty) or a valid number
+    function isValidPin(pin) {
+      return pin === null || !isNaN(pin);
+    }
+
     if (
       !name ||
-      isNaN(pins.powered) ||
-      isNaN(pins.active) ||
-      isNaN(pins.enabled) ||
-      isNaN(pins.closed) ||
-      isNaN(pins.overriden) ||
-      isNaN(pins.enable.pin) ||
-      isNaN(pins.enable.value) ||
-      isNaN(pins.override.pin) ||
-      isNaN(pins.override.value)
+      !isValidPin(pins.powered) ||
+      !isValidPin(pins.active) ||
+      !isValidPin(pins.enabled) ||
+      !isValidPin(pins.closed) ||
+      !isValidPin(pins.overriden) ||
+      !isValidPin(pins.enable.pin) ||
+      !isValidPin(pins.enable.value) ||
+      !isValidPin(pins.override.pin) ||
+      !isValidPin(pins.override.value)
     ) {
       showToast("{{ _('Συμπλήρωσε όλα τα πεδία σωστά.') }}", 'error');
       return;
     }
+
 
     const device = {
       name,

@@ -5,6 +5,9 @@ import json
 
 GPIO.setmode(GPIO.BCM)
 
+# Define input pin keys globally so they are consistent and easy to update
+INPUT_PIN_KEYS = ['powered', 'active', 'enabled', 'closed', 'overriden']
+
 class GPIOSupervisor:
     def __init__(self, on_pin_change=None):
         self.devices = {}
