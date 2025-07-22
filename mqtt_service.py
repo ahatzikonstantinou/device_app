@@ -127,9 +127,16 @@ class MQTTService:
         # Νέα topics από τις συσκευές
         new_topics = set()
         for device in self.device_provider.get_devices():
+            # Add device-level mqtt topics
             mqtt = device.get('mqtt', {})
-            for key in ['enable', 'override', 'report_status']:
-                topic = mqtt.get(key)
+            for topic in mqtt.values():
+                if topic:
+                    new_topics.add(topic)
+            
+            # Add mqtt topics from pins
+            pins = device.get('pins', {})
+            for pin_data in pins.values():
+                topic = pin_data.get('mqtt')
                 if topic:
                     new_topics.add(topic)
 

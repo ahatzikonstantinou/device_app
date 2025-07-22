@@ -54,8 +54,10 @@ def are_pins_unique(pins, device_list, exclude_id=None):
     for device in device_list:
         if exclude_id is not None and device['id'] == exclude_id:
             continue
-        for pin_info in device['pins'].values():
+        device_pins = device.get('pins', {})
+        for pin_info in device_pins.values():
             used.add(pin_info['pin'])
+
     for pin_info in pins.values():
         if pin_info['pin'] in used:
             return False
@@ -68,9 +70,13 @@ def normalize_pins(pins_in):
         if isinstance(val, dict):
             pin_num = val.get('pin')
             value_num = val.get('value', 0)
+            type = val.get('type', 'out')
+            mqtt = val.get('mqtt', '')
         else:
             pin_num = val
             value_num = 0
+            type = val.get('type', 'in')
+            mqtt = val.get('mqtt', None)
 
         # Skip if pin number is not defined or not an int
         if pin_num is None or not isinstance(pin_num, int):
@@ -81,7 +87,9 @@ def normalize_pins(pins_in):
 
         pins[key] = {
             "pin": pin_num,
-            "value": value_num
+            "value": value_num,
+            "type": type,
+            "mqtt": mqtt
         }
 
     return pins
@@ -149,13 +157,15 @@ def devices():
     if request.method == 'POST':
         data = request.json
         print(json.dumps(data, indent=4))
-        if not data or 'name' not in data or 'pins' not in data or 'mqtt' not in data:
+        if not data or 'name' not in data not in data or 'mqtt' not in data:
             abort(400, "Invalid input")
 
         name = data['name']
-        pins_in  = data['pins']
         mqtt = data['mqtt']
 
+        pins_in = data.get('pins', {})
+        
+        # Normalize pins
         pins = normalize_pins(pins_in)
 
         if not is_name_unique(name, device_list ):
@@ -194,9 +204,11 @@ def update_device(device_id):
         print(json.dumps(request.json, indent=4)) #only PUT has request body
         data = request.json
         name = data['name']
-        pins_in  = data['pins']
         mqtt = data['mqtt']
 
+        pins_in = data.get('pins', {})
+        
+        # Normalize pins
         pins = normalize_pins(pins_in)
 
         if not is_name_unique(name, device_list, device_id ):

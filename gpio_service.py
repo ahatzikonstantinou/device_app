@@ -33,27 +33,14 @@ class GPIOSupervisor:
 
     def add_device(self, device):
         self.devices[device['id']] = device
-        pins = device['pins']
-        for key in INPUT_PIN_KEYS:
-            if key in pins:
-                GPIO.setup(pins[key]['pin'], GPIO.IN)
+        pins = device.get('pins', {})
 
-        # GPIO.setup(pins['powered']['pin'], GPIO.IN)
-        # GPIO.setup(pins['active']['pin'], GPIO.IN)
-        # GPIO.setup(pins['enabled']['pin'], GPIO.IN)
-        # GPIO.setup(pins['closed']['pin'], GPIO.IN)
-        # GPIO.setup(pins['overriden']['pin'], GPIO.IN)
-
-        for key in OUTPUT_PIN_KEYS:
-            if key in pins:
-                GPIO.setup(pins[key]['pin'], GPIO.OUT)
-                self.set_output_value(device['id'], key, pins[key]['value'])
-
-        # GPIO.setup(pins['enable']['pin'], GPIO.OUT)
-        # self.set_output_value(device['id'], 'enable', pins['enable']['value'])
-        # GPIO.setup(pins['override']['pin'], GPIO.OUT)
-        # self.set_output_value(device['id'], 'override', pins['override']['value'])
-
+        for key, pin_data in pins.items():
+            if pin_data.get('type') == 'in':
+                GPIO.setup(pin_data['pin'], GPIO.IN)
+            elif pin_data.get('type') == 'out':
+                GPIO.setup(pin_data['pin'], GPIO.OUT)
+                self.set_output_value(device['id'], key, pin_data.get('value', 0))
 
     def update_device(self, device):
         # essentially updated the dictionary and reset the pins
@@ -64,24 +51,22 @@ class GPIOSupervisor:
             del self.devices[id]
 
     def read_input_pins(self, device):
-        # pins που είναι input
-        input_pins_keys = ['powered', 'active', 'enabled', 'closed', 'overriden']
-        pins = device['pins']
+        pins = device.get('pins', {})
         new_pins = {}
 
-        for key in pins:
-            pin_num = pins[key]['pin']
-            if key in input_pins_keys:
+        for key, pin_data in pins.items():
+            if pin_data.get('type') == 'in':
+                pin_num = pin_data['pin']
                 gpio_val = GPIO.input(pin_num)
-                new_pins[key] = {'pin': pin_num, 'value': gpio_val}
+                new_pins[key] = {'pin': pin_num, 'value': gpio_val, 'type': 'in'}
             else:
-                # Για output pins μπορείς να κρατήσεις απλά τον αριθμό ή και να αφαιρέσεις
-                # Εδώ απλά κρατάμε την αρχική τιμή (προαιρετικό)
-                new_pins[key] = pins[key]
+                # Keep output pins as they are
+                new_pins[key] = pin_data
 
-        # Αντικαθιστούμε το pins dictionary με το νέο
         device['pins'] = new_pins
         return device
+
+
     
     def set_output_value(self, device_id, pin_key, value):
         """
@@ -92,7 +77,9 @@ class GPIOSupervisor:
         if not device:
             return {"success": False, "error": "Device not found"}
 
-        pin_info = device['pins'].get(pin_key)
+        pin_info = device.get('pins', {}).get(pin_key)
+        pin_info = pin_info if pin_info and pin_info.get('type') == 'out' else None
+
         if not pin_info:
             return {"success": False, "error": f"Pin {pin_key} not found"}
 
@@ -120,35 +107,30 @@ class GPIOSupervisor:
             return {"success": False, "pin": pin_num, "error": str(e)}
         
     def monitor_loop(self):
-        input_pins_keys = INPUT_PIN_KEYS
-
         while True:
             for device_id, device in self.devices.items():
                 pins = device.get('pins', {})
 
-                for key in input_pins_keys:
-                    pin_info = pins.get(key)
-                    if not pin_info:
-                        continue
+                for key, pin_info in pins.items():
+                    if pin_info.get('type') == 'in':
+                        pin_num = pin_info['pin']
+                        try:
+                            current_value = GPIO.input(pin_num)
+                        except Exception as e:
+                            print(f"Error reading GPIO pin {pin_num}: {e}")
+                            continue
 
-                    pin_num = pin_info['pin']
-                    try:
-                        current_value = GPIO.input(pin_num)
-                    except Exception as e:
-                        print(f"Error reading GPIO pin {pin_num}: {e}")
-                        continue
+                        last_value = pin_info.get('value')
+                        if current_value != last_value:
+                            # Update in-memory value
+                            self.devices[device_id]['pins'][key]['value'] = current_value
 
-                    # Compare with last known value
-                    last_value = pin_info.get('value')
-                    if current_value != last_value:
-                        # Update in-memory value
-                        self.devices[device_id]['pins'][key]['value'] = current_value
-
-                        # Notify observers
-                        for observer in self.on_pin_change:
-                            try:
-                                observer(device_id, key, current_value)
-                            except Exception as e:
-                                print(f"Error in on_pin_change observer: {e}")
+                            # Notify observers
+                            for observer in self.on_pin_change:
+                                try:
+                                    observer(device_id, key, current_value)
+                                except Exception as e:
+                                    print(f"Error in on_pin_change observer: {e}")
 
             time.sleep(1)
+

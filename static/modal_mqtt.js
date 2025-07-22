@@ -20,8 +20,7 @@ async function checkMQTTStatus() {
 function enableMQTTSpanButtons() {
   const topicSamples = {
     status: '{}',
-    enable: '1',
-    override: '0',
+    other: '1',
     report_status: ''
   };
 
@@ -53,9 +52,11 @@ function enableMQTTSpanButtons() {
           console.warn('Device not found for status topic');
           openMQTTModal(topic, '{}');
         }
-      } else {
+      } else if (type === 'report_status') {
         openMQTTModal(topic, topicSamples[type] || '');
-      }
+      } else {
+        openMQTTModal(topic, topicSamples['other'] || '');
+      } 
     };
   });
 }

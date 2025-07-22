@@ -58,10 +58,14 @@ legend {
 .form-group {
   position: relative;
   margin-bottom: 1.8rem;
+  display: flex;
+  align-items: center;
 }
 
 .form-group input {
-  width: 100%;
+  flex: 1; /* Take all available space */
+  min-width: 0; /* Prevent overflow */
+  /* width: 100%; */
   border: none;
   border-bottom: 2px solid #ccc;
   outline: none;
@@ -77,6 +81,7 @@ legend {
 
 /* Floating label */
 .form-group label {
+  white-space: nowrap; /* Prevent label from wrapping */
   position: absolute;
   top: 12px;
   left: 8px;
@@ -93,6 +98,119 @@ legend {
   color: #6200ee;
   background-color: #fff;
   padding: 0 4px;
+}
+
+.form-group[draggable="true"],
+.form-inline-pin[draggable="true"] {
+  cursor: move;
+}
+
+/* for radio buttons for output pins*/
+.form-inline-pin {
+  position: relative;
+  display: flex;
+  align-items: center; /* Align delete button vertically centered */
+  gap: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.form-inline-pin .pin-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Fill all remaining space */
+}
+
+.form-inline-pin .pin-top-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-inline-pin .pin-subscribe-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-inline-pin .pin-content .pin-top-row .pin-input-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Allows it to take up remaining space */
+}
+
+
+.form-inline-pin input {
+  flex-grow: 1;
+  min-width: 0; /* σημαντικό για flexbox */
+  padding-left: 8px; /* αρκετό για το label */
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  background: transparent;
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;  
+  padding-left: 8px; /* αρκετό για το label */
+}
+
+.input-wrapper input {
+  flex-grow: 1;
+  min-width: 0; /* σημαντικό για flexbox */
+  width: 100%;
+  padding: 16px 8px 6px 8px; /* Enough top padding for floating label */
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  background: transparent;
+}
+
+.input-wrapper label {
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  font-size: 16px;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  background: white;
+  padding: 0 4px;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.input-wrapper input:focus + label,
+.input-wrapper input:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #6200ee;
+  background-color: #fff;
+  padding: 0 4px;
+}
+
+.form-inline-pin .radio-group {
+  display: flex;
+  align-items: flex-end; /* Align radios with bottom of input */
+  gap: 0.75rem;
+  /*min-width: 100px; /* ✅ Καθορισμένο πλάτος ώστε να φαίνεται */
+  flex-shrink: 0;    /* ✅ Να μην μικραίνει αν δεν χωράει */
+  padding: 0.5rem 0;         /* ✅ Δίνει "ύψος" στον container */
+  min-height: 38px; /* ή 2rem αν προτιμάς */
+  z-index: 3; /* πάνω από το input */
+  white-space: nowrap;
+  align-self: flex-start; /* Default if you want top-aligned */
+  height: fit-content;
+}
+
+.form-inline-pin .radio-group label
+{
+  position: relative;
+  pointer-events:auto
 }
 
 /* Buttons */
@@ -480,66 +598,6 @@ button[type="button"]:hover {
   100% { transform: rotate(360deg); }
 }
 
-/* for radio buttons for output pins*/
-.form-inline-pin {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.form-inline-pin input {
-  flex-grow: 1;
-  min-width: 0; /* σημαντικό για flexbox */
-  padding-left: 8px; /* αρκετό για το label */
-  font-size: 16px;
-  border: none;
-  border-bottom: 2px solid #ccc;
-  outline: none;
-  background: transparent;
-}
-
-.form-inline-pin label {
-  position: absolute;
-  left: 8px;
-  top: 12px;
-  font-size: 16px;
-  color: #999;
-  pointer-events: none;
-  transition: all 0.2s ease-out;
-  background: white;
-  padding: 0 4px;
-  white-space: nowrap;
-  z-index: 2;
-}
-
-.form-inline-pin input:focus + label,
-.form-inline-pin input:not(:placeholder-shown) + label {
-  top: -10px;
-  font-size: 12px;
-  color: #6200ee;
-  background-color: #fff;
-  padding: 0 4px;
-}
-
-.form-inline-pin .radio-group {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  /*min-width: 100px; /* ✅ Καθορισμένο πλάτος ώστε να φαίνεται */
-  flex-shrink: 0;    /* ✅ Να μην μικραίνει αν δεν χωράει */
-  padding: 0.5rem 0;         /* ✅ Δίνει "ύψος" στον container */
-  min-height: 38px; /* ή 2rem αν προτιμάς */
-  z-index: 3; /* πάνω από το input */
-  white-space: nowrap;
-}
-
-.form-inline-pin .radio-group label
-{
-  position: relative;
-  pointer-events:auto
-}
-
 .mqtt-topic.text-btn {
   color: #1976d2!important;
   cursor: pointer;
@@ -555,4 +613,73 @@ button[type="button"]:hover {
   color: #777;
   margin-top: 0.5rem;
   display: block;
+}
+
+.delete-btn {
+  align-self: center;
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 1.2em;
+  cursor: pointer;
+  /* float: right; */
+  margin-left: 8px;
+  height: fit-content;
+}
+
+/* remove background color from text boxes with filled in values */
+input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #000;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+/* for adding new pins*/
+.form-add-pin {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.form-add-label {
+  font-weight: bold;
+}
+
+.add-pin-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.add-pin-input-wrapper input {
+  width: 100%;
+  padding-right: 28px;
+  padding-left: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.clear-input {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+}
+
+.add-pin-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 4px;
 }

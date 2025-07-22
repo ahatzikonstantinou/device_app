@@ -28,12 +28,18 @@ class DeviceProvider:
     def get_status(self, device):
         if not device:
             return None
+
+        status = {}
+
         pins = device.get('pins', {})
-        return {
-            key: pins[key]['value']
-            for key in ['powered', 'active', 'enabled', 'closed', 'overriden', 'enable', 'override']
-            if key in pins and 'value' in pins[key]
-        }
+        for name, pin in pins.items():
+            status[name] = {
+                'pin': pin['pin'],
+                'value': pin['value']
+            }
+
+        return status
+
 
     def get_publish_status_topic(self, device):
         if not device:

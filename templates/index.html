@@ -58,77 +58,148 @@
           <legend>GPIO Pins</legend>
           <div class="form-group note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output.') }}</div>
 
-          <div class="form-group">
+          <!--div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_powered" name="pin_powered" placeholder=" " />
-            <label for="pin_powered">{{ _('Pin: Powered') }}</label>
+            <label for="pin_powered">{{ _('Input Pin: Powered') }}</label>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_active" name="pin_active" placeholder=" " />
-            <label for="pin_active">{{ _('Pin: Active') }}</label>
+            <label for="pin_active">{{ _('Input Pin: Active') }}</label>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_enabled" name="pin_enabled" placeholder=" " />
-            <label for="pin_enabled">{{ _('Pin: Enabled') }}</label>
+            <label for="pin_enabled">{{ _('Input Pin: Enabled') }}</label>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_closed" name="pin_closed" placeholder=" " />
-            <label for="pin_closed">{{ _('Pin: Closed') }}</label>
+            <label for="pin_closed">{{ _('Input Pin: Closed') }}</label>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_overriden" name="pin_overriden" placeholder=" " />
-            <label for="pin_overriden">{{ _('Pin: Overriden') }}</label>
-          </div>
+            <label for="pin_overriden">{{ _('Input Pin: Overriden') }}</label>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+          </div> -->
 
-          <div class="form-inline-pin">
+          <!-- div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_enable" name="pin_enable" placeholder=" " />
             <label for="pin_enable">{{ _('Output Pin: Enable') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_enable_value" value="0" /> 0</label>
               <label><input type="radio" name="pin_enable_value" value="1" /> 1</label>
             </div>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
           </div>
 
-          <div class="form-inline-pin">
+          <<div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
             <input type="number" id="pin_override" name="pin_override" placeholder=" " />
             <label for="pin_override">{{ _('Output Pin: Override') }}</label>
             <div class="radio-group">
               <label><input type="radio" name="pin_override_value" value="0" /> 0</label>
               <label><input type="radio" name="pin_override_value" value="1" /> 1</label>
             </div>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+          </div> -->
+
+          <!-- <div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+            <div class="pin-content">
+              <div class="pin-top-row">
+                <div class="input-wrapper">
+                  <input type="number" id="pin_enable" name="pin_enable" placeholder=" " />
+                  <label for="pin_enable">{{ _('Output Pin: Enable') }}</label>
+                </div>
+
+                <div class="radio-group">
+                  <label><input type="radio" name="pin_enable_value" value="0" /> 0</label>
+                  <label><input type="radio" name="pin_enable_value" value="1" /> 1</label>
+                </div>
+              </div>
+
+              <div class="pin-subscribe-row">
+                <div class="input-wrapper">
+                  <input type="text" id="mqtt_enable_topic" name="mqtt_enable_topic" placeholder=" " />
+                  <label for="mqtt_enable_topic">{{ _('Subscribe Enable Topic') }}</label>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+          </div>
+
+          <div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+            <div class="pin-content">
+              <div class="pin-top-row">
+                <div class="input-wrapper">
+                  <input type="number" id="pin_override" name="pin_override" placeholder=" " />
+                  <label for="pin_override">{{ _('Output Pin: Override') }}</label>
+                </div>
+
+                <div class="radio-group">
+                  <label><input type="radio" name="pin_override_value" value="0" /> 0</label>
+                  <label><input type="radio" name="pin_override_value" value="1" /> 1</label>
+                </div>
+              </div>
+
+              <div class="pin-subscribe-row">
+                <div class="input-wrapper">
+                  <input type="text" id="mqtt_override_topic" name="mqtt_override_topic" placeholder=" " />
+                  <label for="mqtt_override_topic">{{ _('Subscribe Override Topic') }}</label>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+          </div>           -->
+
+          <div class="form-add-pin">
+            <label for="new-pin-name" class="form-add-label">Add</label>
+            
+            <div class="add-pin-input-wrapper">
+              <input type="text" id="new-pin-name" placeholder="Enter pin name" />
+              <button type="button" class="clear-input" onclick="document.getElementById('new-pin-name').value = ''">✕</button>
+            </div>
+            
+            <button type="button" class="add-pin-btn" onclick="addPin('input')">Input</button>
+            <button type="button" class="add-pin-btn" onclick="addPin('output')">Output</button>
           </div>
         </fieldset>
+
+        
 
         <fieldset>
           <legend>{{ _('MQTT') }}</legend>
 
           <div class="form-group">
-            <input type="text" id="mqtt_pub_status_topic" name="mqtt_pub_status_topic" placeholder=" " />
-            <label for="mqtt_pub_status_topic">{{ _('Publish Status Topic') }}</label>
+            <input type="text" id="mqtt_pub_status" name="mqtt_pub_status" placeholder=" " />
+            <label for="mqtt_pub_status">{{ _('Publish Status Topic') }}</label>
+          </div>
+
+          <!-- <div class="form-group">
+            <input type="text" id="mqtt_enable" name="mqtt_enable" placeholder=" " />
+            <label for="mqtt_enable">{{ _('Subscribe Enable Topic') }}</label>
           </div>
 
           <div class="form-group">
-            <input type="text" id="mqtt_sub_enable_topic" name="mqtt_sub_enable_topic" placeholder=" " />
-            <label for="mqtt_sub_enable_topic">{{ _('Subscribe Enable Topic') }}</label>
-          </div>
+            <input type="text" id="mqtt_override" name="mqtt_override" placeholder=" " />
+            <label for="mqtt_override">{{ _('Subscribe Override Topic') }}</label>
+          </div> -->
 
           <div class="form-group">
-            <input type="text" id="mqtt_sub_override_topic" name="mqtt_sub_override_topic" placeholder=" " />
-            <label for="mqtt_sub_override_topic">{{ _('Subscribe Override Topic') }}</label>
-          </div>
-
-          <div class="form-group">
-            <input type="text" id="mqtt_sub_report_status_topic" name="mqtt_sub_report_status_topic" placeholder=" " />
-            <label for="mqtt_sub_report_status_topic">{{ _('Report Status Topic') }}</label>
+            <input type="text" id="mqtt_sub_report_status" name="mqtt_sub_report_status" placeholder=" " />
+            <label for="mqtt_sub_report_status">{{ _('Report Status Topic') }}</label>
           </div>
         </fieldset>
 
         <div style="text-align: right;">
           <button type="submit" class="text-btn">{{ _('Αποθήκευση') }}</button>
           <button id="form-close-btn" type="button" class="text-btn danger" onclick="closeAddDeviceModal()">{{ _('Κλείσιμο') }}</button>
+          <button id="form-reret-btn" type="button" class="text-btn danger" onclick="resetAddDeviceModal()">{{ _('Επαναφορά') }}</button>
         </div>
       </form>
     </div>
@@ -174,7 +245,114 @@
   let allDevices = [];
   let expandedDeviceId = null;
 
+  // code to add new pins
+  function sanitizeToId(name) {
+    return name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_')            // Replace spaces with _
+      .replace(/[^a-z0-9_]/g, '')      // Remove invalid characters
+      .replace(/^([^a-z])/, '_$1');    // Ensure starts with a letter or underscore
+  }
+
+  function addPin(type) {
+    const rawName = document.getElementById('new-pin-name').value.trim();
+    if (!rawName) return alert("Please enter a pin name.");
+
+    const id = sanitizeToId(rawName);
+    if (!id) return alert("Invalid name for a pin.");
+
+    // Avoid duplicates
+    if (document.getElementById(`pin_${id}`) || document.getElementById(`mqtt_${id}`)) {
+      return alert("Pin already exists.");
+    }
+
+    const label = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    let html = '';
+
+    if (type === 'input') {
+      html = `
+        <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+          <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" " />
+          <label for="pin_${id}">{{ _('Input Pin: ${label}') }}</label>
+          <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+        </div>`;
+    } else if (type === 'output') {
+      html = `
+        <div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+          <div class="pin-content">
+            <div class="pin-top-row">
+              <div class="input-wrapper">
+                <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" " />
+                <label for="pin_${id}">{{ _('Output Pin: ${label}') }}</label>
+              </div>
+              <div class="radio-group">
+                <label><input type="radio" name="pin_${id}" value="0" /> 0</label>
+                <label><input type="radio" name="pin_${id}" value="1" /> 1</label>
+              </div>
+            </div>
+            <div class="pin-subscribe-row">
+              <div class="input-wrapper">
+                <input type="text" id="mqtt_${id}" name="mqtt_${id}" placeholder=" " />
+                <label for="mqtt_${id}">{{ _('Subscribe ${label} Topic') }}</label>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
+        </div>`;
+    }
+
+    const fieldset = document.querySelector('.form-add-pin');
+    fieldset.insertAdjacentHTML('beforebegin', html);
+    document.getElementById('new-pin-name').value = '';
+  }
+  // end of code to add new pins
+
   let isEditing = false; // ή true όταν μπαίνεις σε edit mode
+
+  function removeFormGroup(button) {
+    const container = button.closest('.form-group') || button.closest('.form-inline-pin');
+    if (container) {
+      container.remove();
+    }
+  }
+
+  let draggedElement = null;
+
+  function isDraggableBlock(el) {
+    return el.classList.contains("form-group") || el.classList.contains("form-inline-pin");
+  }
+
+  function handleDragStart(e) {
+    draggedElement = e.currentTarget;
+    draggedElement.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    const target = e.currentTarget;
+    if (target && target !== draggedElement && isDraggableBlock(target)) {
+      const bounding = target.getBoundingClientRect();
+      const offset = e.clientY - bounding.top;
+      const midpoint = bounding.height / 2;
+
+      const parent = target.parentNode;
+      if (offset > midpoint) {
+        parent.insertBefore(draggedElement, target.nextSibling);
+      } else {
+        parent.insertBefore(draggedElement, target);
+      }
+    }
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    if (draggedElement) {
+      draggedElement.classList.remove("dragging");
+      draggedElement = null;
+    }
+  }
 
   function getUsedPins() {
     const used = new Set();
@@ -259,82 +437,106 @@
     container.innerHTML = '';
 
     data.forEach(device => {
-  const p = device.pins || {};
-  const mqtt = device.mqtt || {};
+      const p = device.pins || {};
+      const mqtt = device.mqtt || {};
 
-  const card = document.createElement('div');
-  card.className = 'device-card';
+      const card = document.createElement('div');
+      card.className = 'device-card';
 
-  // Helper to safely render input pins
-  const renderInputPin = (key, label) => {
-    return p[key] ? `<div class="item">{{ _('${label}') }}<span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span></div>` : '';
-  };
+      // Helper to safely render input pins
+      const renderStatusPins = (key, label) => {
+        return p[key] ? `<div class="item">{{ _('${label}') }}<span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span></div>` : '';
+      };
 
-  // Helper to safely render control (output) pins
-  const renderControlPin = (key, label) => {
-    return p[key] ? `
-      <div class="item">
-        <button class="text-btn" onclick="openPinModal(${p[key].pin}, ${p[key].value}, '${label}')">{{ _('${label}') }}</button>
-        <span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span>
-      </div>
-    ` : '';
-  };
+      // Helper to safely render control (output) pins
+      const renderControlPin = (key, label) => {
+        return p[key] ? `
+          <div class="item">
+            <button class="text-btn" onclick="openPinModal(${p[key].pin}, ${p[key].value}, '${label}')">{{ _('${label}') }}</button>
+            <span id="${device.id}-${key}">${p[key].pin} (${p[key].value})</span>
+          </div>
+        ` : '';
+      };
 
-  card.innerHTML = `
-    <div class="device-header" onclick="toggleCard(this)">
-      <h3 class="device-title">${device.name}</h3>
-      <span class="toggle-icon">▾</span>
-    </div>
+      // Render all status pins dynamically
+      const renderInputPin = () => {
+        return Object.entries(p)
+          .filter(([key, pin]) => pin.type === 'in')
+          .map(([key, pin]) =>
+            `<div class="item">${key}: <span id="${device.id}-${key}">${pin.pin} (${pin.value})</span></div>`
+          ).join('');
+      };
 
-    <div class="device-details">
-      <div class="device-section">
-        <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
-        <p class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output') }}</p>
-        <div class="group">
-          <div class="pin-group">
-            <h5>{{ _('Status Pins') }}</h5>
-            ${renderInputPin('powered', 'Powered:')}
-            ${renderInputPin('active', 'Active:')}
-            ${renderInputPin('enabled', 'Enabled:')}
-            ${renderInputPin('closed', 'Closed:')}
-            ${renderInputPin('overriden', 'Overriden:')}
+      // Render all output pins dynamically with control buttons
+      const renderOutputPins = () => {
+        return Object.entries(p)
+          .filter(([key, pin]) => pin.type === 'out')
+          .map(([key, pin]) =>
+            `<div class="item">
+              <button class="text-btn" onclick="openPinModal(${pin.pin}, ${pin.value}, '${key}')">${key}</button>
+              <span id="${device.id}-${key}">${pin.pin} (${pin.value})</span>
+            </div>`
+          ).join('');
+      };
+
+      card.innerHTML = `
+        <div class="device-header" onclick="toggleCard(this)">
+          <h3 class="device-title">${device.name}</h3>
+          <span class="toggle-icon">▾</span>
+        </div>
+
+        <div class="device-details">
+          <div class="device-section">
+            <h4 class="section-title">{{ _('GPIO Pins') }}</h4>
+            <p class="note">{{ _('BCM mode — uses the Broadcom (SoC) GPIO numbers. Values are positive low i.e. a 1 means no signal in input, open relay at output. 0 means signal detected in input, close relay at output') }}</p>
+            <div class="group">
+              <div class="pin-group">
+                <h5>{{ _('Input Pins') }}</h5>
+                ${renderInputPin()}
+              </div>
+
+              <div class="pin-group">
+                <h5>{{ _('Control Pins') }}</h5>
+                ${renderOutputPins()}
+              </div>
+            </div>
           </div>
 
-          <div class="pin-group">
-            <h5>{{ _('Control Pins') }}</h5>
-            ${renderControlPin('enable', 'Enable:')}
-            ${renderControlPin('override', 'Override:')}
+          <hr>
+
+          <div class="device-section">
+            <h4 class="section-title">{{ _('MQTT') }}</h4>
+            <div class="group mqtt">
+              <div class="mqtt-group">
+                <h5>{{ _('Publish Status Topic') }}</h5>
+                <div class="item">{{ _('Status:') }} <span class="mqtt-topic" data-topic-type="status">${mqtt.pub_status || '-'}</span></div>
+              </div>
+              <div class="mqtt-group">
+                <h5>{{ _('Subscribe Control Topics') }}</h5>
+                <div class="item">{{ _('Report status:') }} <span class="mqtt-topic" data-topic-type="report_status">${mqtt.sub_report_status || '-'}</span></div>
+                ${
+                  Object.entries(p)
+                    .filter(([_, pin]) => pin.type === 'out' && pin.mqtt)
+                    .map(([key, pin]) => `
+                      <div class="item">
+                        {{ _('${key}:') }} <span class="mqtt-topic" data-topic-type="${key}">${pin.mqtt || '-'}</span>
+                      </div>
+                    `).join('') ||
+                  `<div class="item">{{ _('No control topics') }}</div>`
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="device-buttons">
+            <button class="text-btn" onclick="editDevice('${device.id}')">{{ _('Επεξεργασία') }}</button>
+            <button class="text-btn danger" onclick="deleteDevice('${device.id}')">{{ _('Διαγραφή') }}</button>
           </div>
         </div>
-      </div>
+      `;
 
-      <hr>
-
-      <div class="device-section">
-        <h4 class="section-title">{{ _('MQTT') }}</h4>
-        <div class="group mqtt">
-          <div class="mqtt-group">
-            <h5>{{ _('Publish Status Topic') }}</h5>
-            <div class="item">{{ _('Status:') }} <span class="mqtt-topic" data-topic-type="status">${mqtt.status || '-'}</span></div>
-          </div>
-          <div class="mqtt-group">
-            <h5>{{ _('Subscribe Control Topics') }}</h5>
-            <div class="item">{{ _('Enable:') }} <span class="mqtt-topic" data-topic-type="enable">${mqtt.enable || '-'}</span></div>
-            <div class="item">{{ _('Override:') }} <span class="mqtt-topic" data-topic-type="override">${mqtt.override || '-'}</span></div>
-            <div class="item">{{ _('Report status:') }} <span class="mqtt-topic" data-topic-type="report_status">${mqtt.report_status || '-'}</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="device-buttons">
-        <button class="text-btn" onclick="editDevice('${device.id}')">{{ _('Επεξεργασία') }}</button>
-        <button class="text-btn danger" onclick="deleteDevice('${device.id}')">{{ _('Διαγραφή') }}</button>
-      </div>
-    </div>
-  `;
-
-  container.appendChild(card);
-});
+      container.appendChild(card);
+    });
 
 
   }
@@ -364,39 +566,84 @@
     setEditIndicator(device.name);
 
     const form = document.getElementById('add-device-form');
+    form.querySelectorAll('.form-inline-pin, .form-group').forEach(e => e.remove()); // Remove dynamic fields
+
     const p = device.pins || {};
     const m = device.mqtt || {};
 
     form.id.value = device.id;
     form.name.value = device.name || '';
 
-    form.pin_powered.value = p.powered?.pin ?? '';
-    form.pin_active.value = p.active?.pin ?? '';
-    form.pin_enabled.value = p.enabled?.pin ?? '';
-    form.pin_closed.value = p.closed?.pin ?? '';
-    form.pin_overriden.value = p.overriden?.pin ?? '';
+    // Dynamically create pin inputs
+    Object.entries(p).forEach(([key, pin]) => {
+      const pinInput = document.createElement('div');
+      pinInput.className = 'form-inline-pin';
 
-    form.pin_enable.value = p.enable?.pin ?? '';
-    form.pin_enable_value.value = p.enable?.value ?? 0;
+      const label = document.createElement('label');
+      label.textContent = `${key} (pin):`;
+      label.htmlFor = `pin_${key}`;
 
-    form.pin_override.value = p.override?.pin ?? '';
-    form.pin_override_value.value = p.override?.value ?? 0;
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.name = `pin_${key}`;
+      input.id = `pin_${key}`;
+      input.value = pin.pin;
 
-    form.mqtt_pub_status_topic.value = m.status ?? '';
-    form.mqtt_sub_enable_topic.value = m.enable ?? '';
-    form.mqtt_sub_override_topic.value = m.override ?? '';
-    form.mqtt_sub_report_status_topic.value = m.report_status ?? '';
+      pinInput.appendChild(label);
+      pinInput.appendChild(input);
 
-    // Only check radio buttons if the value exists and matches an available radio
-    if (p.enable?.value !== undefined) {
-      const radio = form.querySelector(`input[name="pin_enable_value"][value="${p.enable.value}"]`);
-      if (radio) radio.checked = true;
-    }
+      form.appendChild(pinInput);
 
-    if (p.override?.value !== undefined) {
-      const radio = form.querySelector(`input[name="pin_override_value"][value="${p.override.value}"]`);
-      if (radio) radio.checked = true;
-    }
+      if (pin.type === 'out') {
+        // Add value input or radio group for output pin
+        const valueGroup = document.createElement('div');
+        valueGroup.className = 'form-group';
+
+        const valueLabel = document.createElement('label');
+        valueLabel.textContent = `${key} (value):`;
+        valueLabel.htmlFor = `pin_${key}_value`;
+
+        const valueInput = document.createElement('input');
+        valueInput.type = 'number';
+        valueInput.name = `pin_${key}_value`;
+        valueInput.id = `pin_${key}_value`;
+        valueInput.value = pin.value ?? 0;
+
+        valueGroup.appendChild(valueLabel);
+        valueGroup.appendChild(valueInput);
+
+        form.appendChild(valueGroup);
+      }
+    });
+
+    // Dynamically fill in MQTT fields
+    Object.entries(m).forEach(([key, value]) => {
+      const input = form.querySelector(`[name="mqtt_${key}"]`);
+      if (input) {
+        input.value = value ?? '';
+      } else {
+        const mqttGroup = document.createElement('div');
+        mqttGroup.className = 'form-group';
+
+        const mqttLabel = document.createElement('label');
+        mqttLabel.textContent = `${key} (MQTT):`;
+        mqttLabel.htmlFor = `mqtt_${key}`;
+
+        const mqttInput = document.createElement('input');
+        mqttInput.type = 'text';
+        mqttInput.name = `mqtt_${key}`;
+        mqttInput.id = `mqtt_${key}`;
+        mqttInput.value = value ?? '';
+
+        mqttGroup.appendChild(mqttLabel);
+        mqttGroup.appendChild(mqttInput);
+
+        form.appendChild(mqttGroup);
+      }
+    });
+
+    form.mqtt_pub_status.value = m.status ?? '';
+    form.mqtt_sub_report_status.value = m.report_status ?? '';    
 
     editingDeviceId = id;
     form.querySelector('button[type="submit"]').textContent = '{{ _("Ενημέρωση") }}';
@@ -417,64 +664,100 @@
     document.getElementById('edit-indicator').style.display = 'none';    
   }
 
+  // Send a new device to the backend
   document.getElementById('add-device-form').addEventListener('submit', async function (e) {
     e.preventDefault();
+    const formElement = this;
     const form = new FormData(this);
     const name = form.get('name');
     const id = form.get('id');
 
     function parsePin(value) {
-      if (value === null || value === '') {
-        return null; // or undefined, if you prefer
-      }
-      // Check if value is numeric
-      return isNaN(value) ? NaN : Number(value);
+      return value === null || value === '' ? null : (isNaN(value) ? NaN : Number(value));
     }
 
-    const pins = {
-      powered: parsePin(form.get('pin_powered')),
-      active: parsePin(form.get('pin_active')),
-      enabled: parsePin(form.get('pin_enabled')),
-      closed: parsePin(form.get('pin_closed')),
-      overriden: parsePin(form.get('pin_overriden')),
-      enable: {
-        pin: parsePin(form.get('pin_enable')),
-        value: parsePin(form.get('pin_enable_value'))
-      },
-      override: {
-        pin: parsePin(form.get('pin_override')),
-        value: parsePin(form.get('pin_override_value'))
+    const pins = {};
+    const mqtt = {};
+    
+    function getSelectedRadioByName(name) {
+      return document.querySelector(`input[type="radio"][name="${name}"]:checked`);
+    }
+
+    for (const element of formElement.elements) {
+      if (!(element instanceof HTMLInputElement)) continue;
+
+      const { id, type, value } = element;
+      // console.log( 'element: ', element);
+
+      if (!id || type === 'radio') {
+        // console.log( 'it is a radio');
+        continue; // Skip radio inputs entirely
       }
-    };
+      if (id.startsWith('pin_')) {
+        const baseName = id.replace(/^pin_/, '');
+        const pinValue = parsePin(value);
 
-    const mqtt = {
-      status: form.get('mqtt_pub_status_topic'),
-      enable: form.get('mqtt_sub_enable_topic'),
-      override: form.get('mqtt_sub_override_topic'),
-      report_status: form.get('mqtt_sub_report_status_topic')
-    };
+        const selected = getSelectedRadioByName(id);
+        if (selected){
+          // It's an output pin
+          pins[baseName] = {
+            pin: pinValue,
+            value: +selected.value,
+            type: 'out'
+          };
+        } else {
+          pins[baseName] = {
+            pin: pinValue,
+            type: 'in'
+          };
+        }
+      }
+    
 
-    // Validation: name must be present, and all pins must be either null (empty) or a valid number
+      // console.log( 'pins:', pins);
+
+      // Collect MQTT fields
+      
+      if (id.startsWith('mqtt_')) {
+        const baseName = id.replace(/^mqtt_/, '');
+        // Link to pin if baseName matches an existing pin
+        if (pins.hasOwnProperty(baseName)) {
+          pins[baseName].mqtt = value;
+        }
+        else {
+          mqtt[baseName] = value;
+        }
+      }
+      
+      // console.log( 'mqtt > pins:', pins);
+    }
+
+    // console.log( 'pins:', pins);
+
+    // Validation
     function isValidPin(pin) {
-      return pin === null || !isNaN(pin);
+      // console.log('pin: ', pin);
+      // console.log(typeof pin === 'number' && !isNaN(pin)? 'valid' : 'NOT valid');
+      return typeof pin === 'number' && !isNaN(pin);
     }
 
-    if (
-      !name ||
-      !isValidPin(pins.powered) ||
-      !isValidPin(pins.active) ||
-      !isValidPin(pins.enabled) ||
-      !isValidPin(pins.closed) ||
-      !isValidPin(pins.overriden) ||
-      !isValidPin(pins.enable.pin) ||
-      !isValidPin(pins.enable.value) ||
-      !isValidPin(pins.override.pin) ||
-      !isValidPin(pins.override.value)
-    ) {
-      showToast("{{ _('Συμπλήρωσε όλα τα πεδία σωστά.') }}", 'error');
+    // Check for name overlap between input and output pins
+    const allPinNames = Object.keys(pins).map(sanitizeToId);
+    const uniquePinNames = new Set(allPinNames);
+    if (uniquePinNames.size !== allPinNames.length) {
+      showToast("{{ _('Κάθε pin πρέπει να έχει μοναδικό όνομα.') }}", 'error');
       return;
     }
 
+    const pinValid = Object.values(pins).every(p => 
+      isValidPin(p.pin) && 
+      (p.value === undefined || isValidPin(p.value))
+    );
+    
+    if (!name || !pinValid) {
+      showToast("{{ _('Συμπλήρωσε όλα τα πεδία σωστά.') }}", 'error');
+      return;
+    }
 
     const device = {
       id,
@@ -494,13 +777,14 @@
       });
     } else {
       const used = getUsedPins();
-      const conflict = Object.entries(pins).find(([k, v]) => {
-        const pinNum = typeof v === 'object' && v != null ? v.pin : v;
-        return used.has(pinNum);
-      });
+      const conflict = Object.entries(pins).find(([name, pinObj]) => 
+        used.has(pinObj.pin)
+      );
+
       if (conflict) {
+        const [conflictName, pinObj] = conflict;
         const msgTemplate = `{{ _('Το Pin %%\(conflict\)s χρησιμοποιείται ήδη.') }}`;
-        const msg = msgTemplate.replace('%(conflict)s', conflict);
+        const msg = msgTemplate.replace('%(conflict)s', conflictName);
         showToast(msg, 'error');
         return;
       }
@@ -508,7 +792,7 @@
       res = await fetch('/api/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, pins, mqtt })
+        body: JSON.stringify(device)
       });
     }
 
@@ -518,13 +802,13 @@
       editingDeviceId = null;
       setEditIndicator(null);
       fetchDevices();
-      
       exitEditMode();
     } else {
       const err = await res.text();
       showToast("Σφάλμα: " + err, 'error');
     }
   });
+
 
   fetchDevices();
   checkMQTTStatus();
@@ -615,6 +899,14 @@
 
   function closeAddDeviceModal() {
     addNewDevice(); // reset the form
+    exitEditMode();
+  }
+
+  function resetAddDeviceModal() {
+    const form = document.getElementById('add-device-form');
+    if (form) {
+      form.querySelectorAll('div.form-inline-pin, div.form-group').forEach(div => div.remove());
+    }
     exitEditMode();
   }
 
