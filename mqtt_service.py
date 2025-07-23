@@ -27,33 +27,23 @@ class MQTTService:
         payload = msg.payload.decode()
         print(f"Received MQTT message on '{topic}': '{payload}'")
 
-        if topic.endswith("/enable"):
-            command = "enable"
-        elif topic.endswith("/override"):
-            command = "override"
-        elif topic.endswith("/report_status"):
-            command = "report_status"
-        else:
-            print(f"[MQTT] Unknown topic '{topic}' — ignoring.")
-            return
-        print(f"Command is {command}")
-
         device = self.device_provider.get_device_by_topic(topic)
         if not device:
-            raise ValueError(f"MQTT service: No device found for mqtt topic '{topic}'.")
+            print(f"MQTT service: No device found for mqtt topic '{topic}' — ignoring.")
+            return
         
         print(f"Device:\n{json.dumps(device, indent=2)}")
-        if command in ["enable", "override"]:
+        if topic == self.device_provider.get_subscribe_report_status_topic(device):
+            # Respond by publishing current status
+            self.publish_status(device)
+        else:
             # Notify all observers that message
             if callable(self.on_message):
                 try:
                     value = int(payload)
-                    self.on_message(topic, command, value)
+                    self.on_message(topic, value)
                 except ValueError:
-                    print(f"Ignoring invalid payload for {topic}, {command}: {payload}")
-        elif command == "report_status":
-            # Respond by publishing current status
-            self.publish_status(device)
+                    print(f"Ignoring invalid payload for {topic}: {payload}")
 
     def publish_status(self, device):
         status = json.dumps(self.device_provider.get_status(device), indent=2)
@@ -128,10 +118,9 @@ class MQTTService:
         new_topics = set()
         for device in self.device_provider.get_devices():
             # Add device-level mqtt topics
-            mqtt = device.get('mqtt', {})
-            for topic in mqtt.values():
-                if topic:
-                    new_topics.add(topic)
+            mqtt_subscribe_topic = self.device_provider.get_subscribe_report_status_topic(device)
+            if mqtt_subscribe_topic:
+                new_topics.add(mqtt_subscribe_topic)
             
             # Add mqtt topics from pins
             pins = device.get('pins', {})

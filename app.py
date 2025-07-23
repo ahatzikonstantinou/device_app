@@ -1,12 +1,11 @@
 import eventlet #this must come first before anything else
 eventlet.monkey_patch()
 
-from flask import Flask, render_template, request, jsonify, abort
-from flask_babel import Babel, gettext as _
+from flask import Flask, render_template, request, jsonify, abort, g, Response
+from flask_babel import Babel, gettext as _, get_locale as babel_get_locale
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-from flask import g
-from flask_babel import get_locale as babel_get_locale
+
 import uuid
 import json
 import os
@@ -119,12 +118,12 @@ def get_locale():
 
 babel.init_app(app, locale_selector=get_locale)
 
-def execute_command_on_device(mqtt_topic, command, value):
+def execute_command_on_device(mqtt_topic, value):
     device = device_provider.get_device_by_topic(mqtt_topic)
     if not device:
         raise ValueError(f"MQTT observer: No device found for mqtt topic '{mqtt_topic}'.")
-    # command is "enable" or "override" so it is the pin_key
-    supervisor.set_output_value(device['id'], command, value)
+    pinName = device_provider.get_pinName_by_topic(device['id'], mqtt_topic)
+    supervisor.set_output_value(device['id'], pinName, value)
     
 with open('config.json', 'r', encoding='utf-8') as f:
     config = json.load(f)
@@ -191,7 +190,11 @@ def devices():
     for device in device_list:
         updated_device = supervisor.read_input_pins(device)
         updated_devices.append(updated_device)
-    return jsonify(device_list), 200
+    # print(f"Sending devices: {json.dumps(updated_devices, sort_keys=False)}")
+    return Response(
+        json.dumps(updated_devices, sort_keys=False),
+        mimetype='application/json'
+    )
 
 @app.route('/api/devices/<device_id>', methods=['PUT', 'DELETE'])
 def update_device(device_id):

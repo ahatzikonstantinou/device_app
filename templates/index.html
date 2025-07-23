@@ -165,8 +165,8 @@
               <button type="button" class="clear-input" onclick="document.getElementById('new-pin-name').value = ''">✕</button>
             </div>
             
-            <button type="button" class="add-pin-btn" onclick="addPin('input')">Input</button>
-            <button type="button" class="add-pin-btn" onclick="addPin('output')">Output</button>
+            <button type="button" class="add-pin-btn" onclick="addPin('in')">Input</button>
+            <button type="button" class="add-pin-btn" onclick="addPin('out')">Output</button>
           </div>
         </fieldset>
 
@@ -255,8 +255,9 @@
       .replace(/^([^a-z])/, '_$1');    // Ensure starts with a letter or underscore
   }
 
-  function addPin(type) {
-    const rawName = document.getElementById('new-pin-name').value.trim();
+  function addPin(type, pinName = null, pin = null) {
+    // console.log(`adding pin[${pinName}]: `, pin);
+    const rawName = pinName ?? document.getElementById('new-pin-name').value.trim();
     if (!rawName) return alert("Please enter a pin name.");
 
     const id = sanitizeToId(rawName);
@@ -268,32 +269,35 @@
     }
 
     const label = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    const pinValue = pin?.pin ?? '';
+    const mqttValue = pin?.mqtt ?? '';
+    const radioValue = pin?.value;
     let html = '';
 
-    if (type === 'input') {
+    if (type === 'in') {
       html = `
         <div class="form-group" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
-          <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" " />
+          <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" " value="${pinValue}"/>
           <label for="pin_${id}">{{ _('Input Pin: ${label}') }}</label>
           <button type="button" class="delete-btn" onclick="removeFormGroup(this)">✕</button>
         </div>`;
-    } else if (type === 'output') {
+    } else if (type === 'out') {
       html = `
         <div class="form-inline-pin" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
           <div class="pin-content">
             <div class="pin-top-row">
               <div class="input-wrapper">
-                <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" " />
+                <input type="number" id="pin_${id}" name="pin_${id}" placeholder=" "  value="${pinValue}"/>
                 <label for="pin_${id}">{{ _('Output Pin: ${label}') }}</label>
               </div>
               <div class="radio-group">
-                <label><input type="radio" name="pin_${id}" value="0" /> 0</label>
-                <label><input type="radio" name="pin_${id}" value="1" /> 1</label>
+                <label><input type="radio" name="pin_${id}" value="0" ${radioValue === 0 ? 'checked' : ''}/> 0</label>
+                <label><input type="radio" name="pin_${id}" value="1" ${radioValue === 1 ? 'checked' : ''} /> 1</label>
               </div>
             </div>
             <div class="pin-subscribe-row">
               <div class="input-wrapper">
-                <input type="text" id="mqtt_${id}" name="mqtt_${id}" placeholder=" " />
+                <input type="text" id="mqtt_${id}" name="mqtt_${id}" placeholder=" "  value="${mqttValue}"/>
                 <label for="mqtt_${id}">{{ _('Subscribe ${label} Topic') }}</label>
               </div>
             </div>
@@ -304,6 +308,7 @@
 
     const fieldset = document.querySelector('.form-add-pin');
     fieldset.insertAdjacentHTML('beforebegin', html);
+    // console.log(`added html to fieldset`, html, fieldset);
     document.getElementById('new-pin-name').value = '';
   }
   // end of code to add new pins
@@ -557,6 +562,7 @@
   let editingDeviceId = null;
 
   function editDevice(id) {
+    resetAddDeviceModal();
     enterEditMode();
     document.getElementById('form-title').textContent = '{{ _("Επεξεργασία Συσκευής") }}';
     
@@ -566,7 +572,6 @@
     setEditIndicator(device.name);
 
     const form = document.getElementById('add-device-form');
-    form.querySelectorAll('.form-inline-pin, .form-group').forEach(e => e.remove()); // Remove dynamic fields
 
     const p = device.pins || {};
     const m = device.mqtt || {};
@@ -574,76 +579,14 @@
     form.id.value = device.id;
     form.name.value = device.name || '';
 
-    // Dynamically create pin inputs
+    // Dynamically create pins
     Object.entries(p).forEach(([key, pin]) => {
-      const pinInput = document.createElement('div');
-      pinInput.className = 'form-inline-pin';
-
-      const label = document.createElement('label');
-      label.textContent = `${key} (pin):`;
-      label.htmlFor = `pin_${key}`;
-
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.name = `pin_${key}`;
-      input.id = `pin_${key}`;
-      input.value = pin.pin;
-
-      pinInput.appendChild(label);
-      pinInput.appendChild(input);
-
-      form.appendChild(pinInput);
-
-      if (pin.type === 'out') {
-        // Add value input or radio group for output pin
-        const valueGroup = document.createElement('div');
-        valueGroup.className = 'form-group';
-
-        const valueLabel = document.createElement('label');
-        valueLabel.textContent = `${key} (value):`;
-        valueLabel.htmlFor = `pin_${key}_value`;
-
-        const valueInput = document.createElement('input');
-        valueInput.type = 'number';
-        valueInput.name = `pin_${key}_value`;
-        valueInput.id = `pin_${key}_value`;
-        valueInput.value = pin.value ?? 0;
-
-        valueGroup.appendChild(valueLabel);
-        valueGroup.appendChild(valueInput);
-
-        form.appendChild(valueGroup);
-      }
+      // console.log('pin:', pin);
+      addPin(pin.type, key, pin);
     });
-
-    // Dynamically fill in MQTT fields
-    Object.entries(m).forEach(([key, value]) => {
-      const input = form.querySelector(`[name="mqtt_${key}"]`);
-      if (input) {
-        input.value = value ?? '';
-      } else {
-        const mqttGroup = document.createElement('div');
-        mqttGroup.className = 'form-group';
-
-        const mqttLabel = document.createElement('label');
-        mqttLabel.textContent = `${key} (MQTT):`;
-        mqttLabel.htmlFor = `mqtt_${key}`;
-
-        const mqttInput = document.createElement('input');
-        mqttInput.type = 'text';
-        mqttInput.name = `mqtt_${key}`;
-        mqttInput.id = `mqtt_${key}`;
-        mqttInput.value = value ?? '';
-
-        mqttGroup.appendChild(mqttLabel);
-        mqttGroup.appendChild(mqttInput);
-
-        form.appendChild(mqttGroup);
-      }
-    });
-
-    form.mqtt_pub_status.value = m.status ?? '';
-    form.mqtt_sub_report_status.value = m.report_status ?? '';    
+    
+    form.mqtt_pub_status.value = m.pub_status ?? '';
+    form.mqtt_sub_report_status.value = m.sub_report_status ?? '';    
 
     editingDeviceId = id;
     form.querySelector('button[type="submit"]').textContent = '{{ _("Ενημέρωση") }}';
@@ -652,6 +595,7 @@
 
 
   function addNewDevice() {
+    resetAddDeviceModal();
     enterEditMode();
     editingDeviceId = null;
     const form = document.getElementById('add-device-form');
@@ -905,7 +849,10 @@
   function resetAddDeviceModal() {
     const form = document.getElementById('add-device-form');
     if (form) {
-      form.querySelectorAll('div.form-inline-pin, div.form-group').forEach(div => div.remove());
+      const firstFieldset = form.querySelector('fieldset');
+      if (firstFieldset) {
+        firstFieldset.querySelectorAll('div.form-inline-pin, div.form-group').forEach(div => div.remove());
+      }
     }
     exitEditMode();
   }
