@@ -5,9 +5,10 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/home/pi/my_device_app
-ExecStart=/usr/bin/python3 /home/pi/my_device_app/app.py
+ExecStart=/home/pi/my_device_app/venv/bin/python /home/pi/my_device_app/app.py
 Restart=always
 RestartSec=10
+Environment="PATH=/home/pi/my_device_app/venv/bin"
 
 [Install]
 WantedBy=multi-user.target
