@@ -3,6 +3,9 @@ import gpiod
 import threading
 import time
 from gpiod.line import Direction, Value
+import signal
+import sys
+
 
 # GPIO.setmode(GPIO.BCM)
 CHIP = "/dev/gpiochip0"
@@ -15,11 +18,19 @@ class GPIOSupervisor:
     def __init__(self, on_pin_change=None):
         self.devices = {}
         
+        signal.signal(signal.SIGINT, self.cleanup)
+
         # Allow multiple observers, default to empty list if None
         self.on_pin_change = on_pin_change if on_pin_change is not None else []
         self.line_requests = {}  # {pin: request object}
         self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
         self.monitor_thread.start()
+
+    def cleanup(self, signum, frame):
+        print("Caught CTRL-C, releasing GPIO lines...")
+        for request in self.line_requests.values():
+            request.release()
+        sys.exit(0)
 
     def add_pin_change_observer(self, callback):
         if callable(callback):
