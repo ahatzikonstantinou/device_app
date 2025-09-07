@@ -1,12 +1,15 @@
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
+import gpiod
 import threading
 import time
+from gpiod.line import Direction, Value
 
-GPIO.setmode(GPIO.BCM)
+# GPIO.setmode(GPIO.BCM)
+CHIP = "/dev/gpiochip0"
 
 # Define input pin keys globally so they are consistent and easy to update
-INPUT_PIN_KEYS = ['powered', 'active', 'enabled', 'closed', 'overriden']
-OUTPUT_PIN_KEYS = ['enable', 'override']
+# INPUT_PIN_KEYS = ['powered', 'active', 'enabled', 'closed', 'overriden']
+# OUTPUT_PIN_KEYS = ['enable', 'override']
 
 class GPIOSupervisor:
     def __init__(self, on_pin_change=None):
@@ -14,7 +17,7 @@ class GPIOSupervisor:
         
         # Allow multiple observers, default to empty list if None
         self.on_pin_change = on_pin_change if on_pin_change is not None else []
-
+        self.line_requests = {}  # {pin: request object}
         self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
         self.monitor_thread.start()
 
@@ -35,11 +38,17 @@ class GPIOSupervisor:
         pins = device.get('pins', {})
 
         for key, pin_data in pins.items():
+            pin_num = pin_data['pin']
             if pin_data.get('type') == 'in':
-                GPIO.setup(pin_data['pin'], GPIO.IN)
+                settings = gpiod.LineSettings(direction=Direction.INPUT)
             elif pin_data.get('type') == 'out':
-                GPIO.setup(pin_data['pin'], GPIO.OUT)
-                self.set_output_value(device['id'], key, pin_data.get('value', 0))
+                initial = Value.ACTIVE if pin_data.get('value', 0) else Value.INACTIVE
+                settings = gpiod.LineSettings(direction=Direction.OUTPUT, output_value=initial)
+            else:
+                continue
+
+            request = gpiod.request_lines(CHIP, consumer="sip", config={pin_num: settings})
+            self.line_requests[pin_num] = request
 
     def update_device(self, device):
         # essentially updated the dictionary and reset the pins
@@ -47,6 +56,11 @@ class GPIOSupervisor:
 
     def remove_device(self, id):
         if id in self.devices:
+            for pin_data in self.devices[id].get('pins', {}).values():
+                pin_num = pin_data['pin']
+                if pin_num in self.line_requests:
+                    self.line_requests[pin_num].release()
+                    del self.line_requests[pin_num]
             del self.devices[id]
 
     def read_input_pins(self, device):
@@ -54,12 +68,15 @@ class GPIOSupervisor:
         new_pins = {}
 
         for key, pin_data in pins.items():
+            pin_num = pin_data['pin']
             if pin_data.get('type') == 'in':
-                pin_num = pin_data['pin']
-                gpio_val = GPIO.input(pin_num)
-                new_pins[key] = {'pin': pin_num, 'value': gpio_val, 'type': 'in'}
+                try:
+                    value = self.line_requests[pin_num].get_value(pin_num).value
+                except Exception as e:
+                    print(f"Error reading GPIO {pin_num}: {e}")
+                    value = None
+                new_pins[key] = {'pin': pin_num, 'value': value, 'type': 'in'}
             else:
-                # Keep output pins as they are
                 new_pins[key] = pin_data
 
         device['pins'] = new_pins
@@ -77,19 +94,25 @@ class GPIOSupervisor:
             return {"success": False, "error": "Device not found"}
 
         pin_info = device.get('pins', {}).get(pin_key)
-        pin_info = pin_info if pin_info and pin_info.get('type') == 'out' else None
-
-        if not pin_info:
+        if not pin_info or pin_info.get('type') != 'out':
             return {"success": False, "error": f"Pin {pin_key} not found"}
 
         pin_num = pin_info['pin']
 
         try:
-            direction = GPIO.gpio_function(pin_num)
-            if direction != GPIO.OUT:
-                raise RuntimeError(f"GPIO {pin_num} is not configured as OUTPUT (mode={direction})")
+            val = Value.ACTIVE if value else Value.INACTIVE
+            request = self.line_requests.get(pin_num)
+            if not request:
+                raise RuntimeError(f"No request found for GPIO {pin_num}")
 
-            GPIO.output(pin_num, value)
+            # Check if the pin is configured as OUTPUT
+            line_config = request.line_config
+            line_settings = line_config.get(pin_num)
+
+            if not line_settings or line_settings.direction != Direction.OUTPUT:
+                raise RuntimeError(f"GPIO {pin_num} is not configured as OUTPUT")
+            self.line_requests[pin_num].set_value(pin_num, val)
+            
             # Update in-memory
             device['pins'][pin_key]['value'] = value
 
@@ -114,7 +137,7 @@ class GPIOSupervisor:
                     if pin_info.get('type') == 'in':
                         pin_num = pin_info['pin']
                         try:
-                            current_value = GPIO.input(pin_num)
+                            current_value = self.line_requests[pin_num].get_value(pin_num).value
                         except Exception as e:
                             print(f"Error reading GPIO pin {pin_num}: {e}")
                             continue

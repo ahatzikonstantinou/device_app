@@ -105,6 +105,7 @@ device_provider = DeviceProvider(load_devices())
 def save_devices(devices):
     device_provider.update_devices(devices)
     mqtt_client.update_subscriptions()
+    print(f"Saving device: {json.dumps(devices, indent=2)}")
     with open(DEVICE_FILE, 'w') as f:
         json.dump(devices, f, indent=2)
 

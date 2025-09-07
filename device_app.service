@@ -3,12 +3,12 @@ Description=Device Management Flask App
 After=network.target
 
 [Service]
-User=pi
-WorkingDirectory=/home/pi/my_device_app
-ExecStart=/home/pi/my_device_app/venv/bin/python /home/pi/my_device_app/app.py
+User=antonis
+WorkingDirectory=/opt/device_app
+ExecStart=/opt/device_app/venv/bin/python /opt/device_app/app.py
 Restart=always
 RestartSec=10
-Environment="PATH=/home/pi/my_device_app/venv/bin"
+Environment="PATH=/opt/device_app/venv/bin"
 
 [Install]
 WantedBy=multi-user.target

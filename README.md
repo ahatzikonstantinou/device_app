@@ -34,7 +34,7 @@ sudo apt install python3-pip python3-venv -y
 cd /home/pi/my_device_app
 python3 -m venv venv
 source venv/bin/activate
-pip install flask flask-babel flask-cors flask-socketio eventlet paho-mqtt RPi.GPIO 
+pip install flask flask-babel flask-cors flask-socketio eventlet paho-mqtt gpiod 
 ```
 
 Για χρήση με systemd, αντικατέστησε το ExecStart στο device_app.service με:
@@ -46,7 +46,7 @@ ExecStart=/home/pi/my_device_app/venv/bin/python /home/pi/my_device_app/app.py
 Αν δεν χρησιμοποιείς virtual environment, μπορείς να κάνεις:
 
 ```bash
-pip install --break-system-packages flask flask-babel paho-mqtt RPi.GPIO
+pip install --break-system-packages flask flask-babel paho-mqtt 
 ```
 ⚠️ Προσοχή: Αυτή η μέθοδος μπορεί να προκαλέσει προβλήματα στο σύστημα Python του Raspberry Pi.
 
@@ -57,7 +57,7 @@ pip install --break-system-packages flask flask-babel paho-mqtt RPi.GPIO
 ```bash
 sudo apt update
 sudo apt install python3-pip
-pip3 install flask flask-babel flask_cors flask-socketio eventlet paho-mqtt RPi.GPIO
+pip3 install flask flask-babel flask_cors flask-socketio eventlet paho-mqtt gpiod
 ```
 
 ### 3. systemd Υπηρεσία
