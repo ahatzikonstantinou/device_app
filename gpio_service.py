@@ -90,8 +90,29 @@ class GPIOSupervisor:
 
 
     def update_device(self, device):
-        # essentially updated the dictionary and reset the pins
+        device_id = device['id']
+        new_pins = device.get('pins', {})
+        old_device = self.devices.get(device_id, {})
+        old_pins = old_device.get('pins', {})
+
+        # Track pins to release
+        for key, old_pin_data in old_pins.items():
+            old_pin_num = old_pin_data['pin']
+            old_direction = old_pin_data['type']
+
+            new_pin_data = new_pins.get(key)
+            if not new_pin_data:
+                # Pin removed
+                self.client.release_pin(old_pin_num)
+            else:
+                new_direction = new_pin_data['type']
+                if new_direction != old_direction:
+                    # Direction changed
+                    self.client.release_pin(old_pin_num)
+
+        # Update device and request new pins
         self.add_device(device)
+
 
     def remove_device(self, id):
         if id in self.devices:

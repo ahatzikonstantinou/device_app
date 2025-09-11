@@ -28,6 +28,11 @@ def inject_get_locale():
 
 DEVICE_FILE = 'devices.json'
 CONFIG_FILE = 'config.json'
+DEFAULT_CONFIG = {
+    "host": "localhost",
+    "port": 1883
+}
+config = DEFAULT_CONFIG
 
 supervisor = GPIOSupervisor()
 
@@ -126,8 +131,19 @@ def execute_command_on_device(mqtt_topic, value):
     pinName = device_provider.get_pinName_by_topic(device['id'], mqtt_topic)
     supervisor.set_output_value(device['id'], pinName, value)
     
-with open('config.json', 'r', encoding='utf-8') as f:
-    config = json.load(f)
+def load_config():
+    global config
+    try:
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        print(f"!{CONFIG_FILE} not found. Using default configuration.")
+        config = DEFAULT_CONFIG
+    except json.JSONDecodeError as e:
+        print(f"!Error parsing {CONFIG_FILE}: {e}")
+        config = DEFAULT_CONFIG
+load_config()
+
 mqtt_client = MQTTService(config, device_provider, execute_command_on_device)
 
 #Update device data and save file
@@ -253,20 +269,24 @@ def get_device_status(device_id):
 
 @app.route('/settings')
 def settings():
-    with open(CONFIG_FILE) as f:
-        config = json.load(f)
+    global config
+    load_config()
     return render_template('settings.html', config=config)
 
 @app.route('/api/mqtt', methods=['GET', 'POST'])
 def api_mqtt():
+    global config
     if request.method == 'GET':
-        with open('config.json', 'r', encoding='utf-8') as f:
-            config = json.load(f)
-            return jsonify(config)
+        load_config()
+        return jsonify(config)
     else:
         new_config = request.json
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            old_config = json.load(f)
+        
+        try:
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                old_config = json.load(f)
+        except:
+            old_config = {}
 
         # Save new config file
         with open(CONFIG_FILE, 'w', encoding='utf-8') as f:

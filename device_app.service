@@ -1,14 +1,14 @@
 [Unit]
 Description=Device Management Flask App
-After=network.target
+After=network.target gpio-server.service
 
 [Service]
-User=antonis
 WorkingDirectory=/opt/device_app
 ExecStart=/opt/device_app/venv/bin/python /opt/device_app/app.py
 Restart=always
 RestartSec=10
-Environment="PATH=/opt/device_app/venv/bin:PYTHONPATH=/opt/GPIO_server"
+Environment=PATH=/opt/device_app/venv/bin
+Environment=PYTHONPATH=/opt/GPIO_server
 
 [Install]
 WantedBy=multi-user.target
